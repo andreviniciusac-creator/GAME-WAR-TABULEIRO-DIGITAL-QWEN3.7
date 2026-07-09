@@ -1,0 +1,7 @@
+# Build da imagem
+docker build -t war-game .
+
+# Executar container
+docker run -p 8080:80 war-game
+
+# Acesse http://localhost:8080
