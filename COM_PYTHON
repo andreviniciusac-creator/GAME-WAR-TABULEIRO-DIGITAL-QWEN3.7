@@ -1,0 +1,7 @@
+# Com Python 3
+python -m http.server 8000
+
+# Com Node.js (npx)
+npx serve
+
+# Acesse http://localhost:8000
