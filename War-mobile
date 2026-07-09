@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WAR">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05090f">
+<title>WAR — Estratégia e Conquista</title>
+<style>
+:root{
+  --abyss:#05090f;--ink:#0b1322;--chart:#132039;--panel:rgba(12,20,34,.82);
+  --line:rgba(200,155,60,.18);--line2:rgba(148,170,200,.14);--brass:#c89b3c;
+  --brass-dim:#8a6c2c;--verdigris:#4e9c8b;--rust:#b5442e;--bone:#e6e2d3;
+  --muted:#8fa0b8;--shadow:0 18px 50px -20px rgba(0,0,0,.9);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,Roboto,"Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  height:100%;height:100vh;height:100dvh;
+  margin:0;padding:0;
+  background:var(--abyss);color:var(--bone);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overflow:hidden;
+  position:fixed;
+  width:100%;
+  /* ✅ CORREÇÃO: touch-action APENAS no mapa, não no body */
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  overscroll-behavior:none;
+}
+/* ✅ CORREÇÃO: Permitir interação em inputs */
+input,select,textarea{
+  -webkit-user-select:text;
+  user-select:text;
+  -webkit-touch-callout:default;
+}
+button{
+  font:inherit;color:inherit;cursor:pointer;
+  min-height:44px;min-width:44px;
+  -webkit-appearance:none;appearance:none;
+  border:none;background:none;
+}
+input,select{
+  -webkit-appearance:none;appearance:none;
+  font-size:16px;
+  min-height:44px;
+}
+#app{
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  height:100vh;height:100dvh;
+  gap:0;
+  padding-top:var(--sat);
+  padding-bottom:var(--sab);
+  padding-left:var(--sal);
+  padding-right:var(--sar);
+}
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(19,32,57,.95),rgba(5,9,15,.85));
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:8px;flex:0 0 auto}
+.brand b{font-family:var(--serif);font-size:20px;letter-spacing:.3em;font-weight:600;color:var(--brass);text-shadow:0 0 22px rgba(200,155,60,.35)}
+.brand span{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:none}
+.turnbox{display:flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.28)}
+.turnbox .dot{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 12px currentColor}
+.turnbox b{font-size:12px;letter-spacing:.04em}
+.turnbox small{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.phases{display:flex;align-items:center;gap:0;margin-left:auto}
+.phase{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 10px;border:1px solid transparent;position:relative;white-space:nowrap;min-height:36px;display:flex;align-items:center}
+.phase.active{color:var(--abyss);background:var(--brass);border-radius:4px;font-weight:700;box-shadow:0 0 14px -4px var(--brass)}
+.tools{display:flex;gap:4px;flex:0 0 auto;flex-wrap:wrap}
+.btn{
+  background:rgba(255,255,255,.03);border:1px solid var(--line2);color:var(--bone);
+  padding:8px 12px;border-radius:7px;font-size:12.5px;letter-spacing:.02em;
+  transition:.16s border-color,.16s background;
+  min-height:44px;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.btn:active{background:rgba(200,155,60,.15);transform:scale(.98)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.primary{background:var(--brass);color:#1a1206;border-color:var(--brass);font-weight:700}
+.btn.primary:active{background:#dcae4c}
+.btn.good{background:rgba(78,156,139,.2);border-color:rgba(78,156,139,.5);color:#9fe0cf}
+.btn.bad{background:rgba(181,68,46,.18);border-color:rgba(181,68,46,.5);color:#f0a795}
+.btn.sm{padding:6px 10px;font-size:11.5px;border-radius:6px;min-height:36px}
+.btn.icon{padding:8px 10px}
+select,input[type=text]{
+  background:rgba(0,0,0,.35);border:1px solid var(--line2);color:var(--bone);
+  padding:8px 10px;border-radius:7px;font:inherit;font-size:16px;min-height:44px;
+}
+label.chk{display:flex;align-items:center;gap:9px;font-size:13px;cursor:pointer;padding:8px 0;color:var(--bone);min-height:44px}
+label.chk input{accent-color:var(--brass);width:20px;height:20px}
+.stage{display:grid;grid-template-columns:262px minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:0;overflow:hidden}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;padding-right:2px;-webkit-overflow-scrolling:touch}
+.panel{background:var(--panel);border:1px solid var(--line2);border-radius:12px;-webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);box-shadow:var(--shadow);overflow:hidden;flex:0 0 auto}
+.panel>h3{margin:0;padding:10px 12px;font-family:var(--serif);font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel>h3 .tag{font-family:var(--mono);letter-spacing:0;font-size:10px;color:var(--muted);text-transform:none}
+.panel .body{padding:10px 12px}
+.panel.grow{flex:1 1 auto;display:flex;flex-direction:column;min-height:120px}
+.panel.grow .body{overflow:auto;-webkit-overflow-scrolling:touch;flex:1 1 auto}
+.prow{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(148,170,200,.1);min-height:44px}
+.prow:last-child{border-bottom:0}
+.prow .dot{width:13px;height:13px;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
+.prow .nm{font-size:13px;line-height:1.25}
+.prow .nm small{display:block;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.prow .st{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.prow.active{background:linear-gradient(90deg,rgba(200,155,60,.12),transparent);margin:0 -12px;padding-left:12px;padding-right:12px;border-radius:6px}
+.prow.dead{opacity:.34;filter:grayscale(1)}
+.bar{height:3px;border-radius:2px;background:rgba(255,255,255,.07);margin-top:5px;overflow:hidden;grid-column:2/4}
+.bar i{display:block;height:100%;border-radius:2px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.crow{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;min-height:36px}
+.crow .swatch{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+.crow .nm{flex:1 1 auto}
+.crow .bonus{font-family:var(--mono);font-size:11px;color:var(--brass)}
+.crow .own{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.crow.complete .nm{color:#fff;font-weight:600}
+/* ✅ CORREÇÃO CRÍTICA: touch-action APENAS no mapa */
+.mapwrap{
+  position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line2);
+  background:radial-gradient(120% 100% at 50% 0%,#16273f 0%,#0a1120 48%,#04070d 100%);
+  box-shadow:var(--shadow);min-height:0;
+  touch-action:none;
+  -webkit-touch-callout:none;
+}
+#map{display:block;width:100%;height:100%;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
+#map.dragging{cursor:grabbing}
+.zoomctl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:5px;z-index:5}
+.zoomctl .btn{padding:8px 10px;background:rgba(6,10,18,.85);min-height:44px;min-width:44px;font-size:18px}
+.maphint{position:absolute;left:12px;top:10px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(230,226,211,.5);pointer-events:none;background:rgba(0,0,0,.4);padding:6px 10px;border-radius:6px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:fadeout .9s ease 7s forwards}
+@keyframes fadeout{to{opacity:0}}
+.tp{stroke:rgba(4,8,14,.85);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;transition:fill .35s ease,opacity .2s}
+.tn{font-family:var(--sans);font-size:12px;letter-spacing:.04em;fill:rgba(238,242,250,.75);text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:rgba(3,6,12,.9);stroke-width:3px}
+.terr{cursor:pointer}
+.terr .tp{filter:saturate(1.05)}
+.terr:hover .tp,.terr:active .tp{stroke:#fff;stroke-width:2.4}
+.terr.sel .tp{stroke:var(--brass);stroke-width:3.4;filter:drop-shadow(0 0 12px rgba(200,155,60,.85))}
+.terr.tgt .tp{stroke:var(--rust);stroke-width:3;filter:drop-shadow(0 0 10px rgba(181,68,46,.8))}
+.terr.dim{opacity:.34}
+.terr.pulse .tp{animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{stroke-opacity:.55}50%{stroke-opacity:1}}
+.badge circle{stroke:rgba(3,7,14,.9);stroke-width:1.6}
+.badge text{font-family:var(--mono);font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.link{stroke:rgba(160,190,220,.16);stroke-width:1.3;fill:none}
+.link.sea{stroke:rgba(200,155,60,.26);stroke-dasharray:5 6}
+.clabel{font-family:var(--serif);font-size:14px;letter-spacing:.3em;text-transform:uppercase;text-anchor:middle;pointer-events:none;opacity:.5}
+.cbonus{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-anchor:middle;pointer-events:none;opacity:.42}
+.ripple{fill:none;stroke-width:3;pointer-events:none}
+#tooltip{position:absolute;pointer-events:none;z-index:20;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;background:rgba(6,11,20,.95);border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12px;min-width:150px;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);max-width:260px}
+#tooltip.on{opacity:1;transform:none}
+#tooltip b{display:block;font-family:var(--serif);letter-spacing:.1em;text-transform:uppercase;font-size:11.5px;color:var(--brass);margin-bottom:3px}
+#tooltip .r{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px;line-height:1.7}
+#tooltip .r i{font-style:normal;color:var(--bone);font-family:var(--mono)}
+.obj{font-size:13px;line-height:1.55;color:var(--bone)}
+.hand{display:flex;flex-wrap:wrap;gap:6px}
+.tcard{width:64px;border:1px solid var(--line2);border-radius:8px;padding:6px 5px;text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(0,0,0,.25));cursor:pointer;transition:.15s;min-height:70px}
+.tcard:active{transform:scale(.95)}
+.tcard.on{border-color:var(--brass);background:rgba(200,155,60,.16);box-shadow:0 0 14px -3px var(--brass)}
+.tcard .sym{font-size:18px;line-height:1;color:var(--brass)}
+.tcard .nm{font-size:8.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-top:5px;line-height:1.25;height:22px;overflow:hidden}
+.tcard.mine .nm{color:var(--verdigris)}
+.power{display:flex;gap:9px;align-items:flex-start;padding:8px;border:1px solid var(--line2);border-radius:9px;margin-bottom:7px;background:rgba(255,255,255,.025)}
+.power .ico{font-size:18px;line-height:1.1}
+.power .t{font-size:12px;font-weight:600;letter-spacing:.02em}
+.power .d{font-size:10.5px;color:var(--muted);line-height:1.45;margin-top:2px}
+.log{font-size:11.5px;line-height:1.5}
+.logline{display:flex;gap:7px;padding:4px 0;border-bottom:1px dashed rgba(148,170,200,.08)}
+.logline .d{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:0 0 auto}
+.logline em{font-style:normal;color:var(--brass)}
+.logline.sys{color:var(--muted)}
+.bottombar{display:flex;align-items:center;gap:10px;padding:8px 12px;padding-left:calc(12px + var(--sal));padding-right:calc(12px + var(--sar));border-top:1px solid var(--line);background:linear-gradient(0deg,rgba(19,32,57,.95),rgba(5,9,15,.85));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);flex-wrap:wrap}
+#hint{font-size:12px;color:var(--muted);flex:1 1 auto;min-width:0}
+#hint b{color:var(--bone);font-weight:600}
+.reinf{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(200,155,60,.1);font-size:12px;min-height:36px}
+.reinf b{font-family:var(--mono);font-size:18px;color:var(--brass);line-height:1}
+.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.backdrop{position:fixed;inset:0;background:rgba(3,6,12,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;padding-top:calc(16px + var(--sat));padding-bottom:calc(16px + var(--sab));overflow-y:auto;-webkit-overflow-scrolling:touch}
+.backdrop.on{display:flex}
+.modal{width:min(680px,100%);max-height:85vh;overflow:auto;background:linear-gradient(180deg,#101b2f,#080d18);border:1px solid var(--line);border-radius:16px;box-shadow:0 40px 90px -30px #000;animation:rise .28s cubic-bezier(.2,.9,.2,1);-webkit-overflow-scrolling:touch}
+.modal.wide{width:min(880px,100%)}
+.modal.slim{width:min(460px,100%)}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.modal header{padding:16px 20px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:linear-gradient(180deg,#101b2f,#0d1524);z-index:2}
+.modal header h2{margin:0;font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
+.modal header p{margin:5px 0 0;font-size:12px;color:var(--muted);line-height:1.55}
+.modal .content{padding:16px 20px}
+.modal footer{padding:12px 20px 16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;position:sticky;bottom:0;background:linear-gradient(0deg,#080d18,#0d1524);border-top:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field>span{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+/* ✅ CORREÇÃO: Swatches com role=button e estilos adequados */
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{
+  width:48px;height:48px;border-radius:10px;
+  border:3px solid transparent;
+  cursor:pointer;transition:.15s;
+  /* ✅ Essencial para iOS reconhecer como clicável */
+  -webkit-tap-highlight-color:rgba(200,155,60,.3);
+  touch-action:manipulation;
+}
+.sw.on{border-color:var(--brass);transform:scale(1.1);box-shadow:0 0 20px -3px var(--brass)}
+.sw:active{transform:scale(.92);opacity:.85}
+.duel{display:grid;grid-template-columns:1fr 64px 1fr;gap:10px;align-items:center}
+.side{text-align:center;padding:12px;border-radius:12px;border:1px solid var(--line2);background:rgba(0,0,0,.25)}
+.side .who{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.side .terr-nm{font-family:var(--serif);font-size:15px;letter-spacing:.08em;margin:3px 0 2px}
+.side .armies{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.side .armies b{color:var(--bone);font-size:18px}
+.vs{text-align:center;font-family:var(--serif);letter-spacing:.14em;color:var(--brass);font-size:14px}
+.odds{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px}
+.odds b{color:var(--brass);font-size:14px}
+.oddsbar{height:5px;border-radius:3px;background:rgba(181,68,46,.4);overflow:hidden;margin-top:6px}
+.oddsbar i{display:block;height:100%;background:var(--verdigris);transition:width .4s}
+.dicerow{display:flex;gap:6px;justify-content:center;margin-top:10px;min-height:44px;flex-wrap:wrap}
+.die{width:38px;height:38px;border-radius:9px;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:5px;background:linear-gradient(150deg,#c94a36,#7c2318);box-shadow:0 5px 12px -4px #000,inset 0 -2px 0 rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.18);border:1px solid rgba(0,0,0,.35)}
+.die.def{background:linear-gradient(150deg,#e0b13e,#a97a12)}
+.die .pip{width:6px;height:6px;border-radius:50%;background:#f5efe4;align-self:center;justify-self:center;box-shadow:inset 0 1px 1px rgba(0,0,0,.4)}
+.die.def .pip{background:#2a1d08}
+.die.faded{opacity:.32}
+.die.win{outline:2px solid var(--verdigris);outline-offset:2px}
+.die.lose{outline:2px solid #050505;outline-offset:2px;opacity:.6;filter:saturate(.4)}
+.die.rolling{animation:tumble .55s cubic-bezier(.36,.07,.19,.97) infinite}
+.die.settle{animation:settle .32s ease-out}
+@keyframes tumble{0%{transform:translateY(0) rotate(0) scale(1)}20%{transform:translateY(-10px) rotate(-95deg) scale(1.06)}45%{transform:translateY(2px) rotate(160deg) scale(.96)}70%{transform:translateY(-6px) rotate(280deg) scale(1.04)}100%{transform:translateY(0) rotate(360deg) scale(1)}}
+@keyframes settle{0%{transform:scale(1.35);filter:brightness(1.6)}60%{transform:scale(.94)}100%{transform:scale(1);filter:brightness(1)}}
+.roundtag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:10px}
+.blog{margin-top:12px;max-height:132px;overflow:auto;-webkit-overflow-scrolling:touch;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line2);padding-top:8px}
+.blog .win{color:var(--verdigris)}
+.blog .lose{color:#f0a795}
+.stat{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.stat .nm{width:104px;font-size:12px}
+.stat .track{flex:1;height:16px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden;display:flex}
+.stat .track i{display:block;height:100%}
+.stat .v{font-family:var(--mono);font-size:11.5px;color:var(--muted);width:78px;text-align:right}
+.victory-sub{font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone);text-align:center;line-height:1.7}
+.crown{font-size:48px;text-align:center;margin:6px 0 2px}
+.tabs{display:none;gap:6px;padding:6px 10px;background:rgba(0,0,0,.3)}
+.tabs .btn{flex:1;min-height:40px}
+@media (max-width:1180px){
+  .stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr)}
+  .col{display:none;max-height:40vh}
+  .col.show{display:flex}
+  .tabs{display:flex}
+  .brand span{display:none}
+  .phase{padding:6px 8px;font-size:9px;letter-spacing:.09em}
+}
+@media (max-width:720px){
+  .topbar{padding:6px 10px;gap:6px}
+  .brand b{font-size:17px;letter-spacing:.22em}
+  .turnbox{padding:4px 8px}
+  .turnbox b{font-size:11px}
+  .turnbox small{font-size:9px}
+  .phase{padding:5px 6px;font-size:8.5px}
+  .tools{gap:3px}
+  .btn{padding:7px 10px;font-size:11.5px;min-height:40px}
+  .bottombar{padding:6px 10px;gap:6px}
+  #hint{font-size:11px;width:100%}
+  .actions{width:100%;justify-content:stretch}
+  .actions .btn{flex:1}
+  .duel{grid-template-columns:1fr;gap:8px}
+  .vs{padding:2px}
+  .modal{max-height:90vh}
+  .modal header h2{font-size:16px}
+  .grid2{grid-template-columns:1fr}
+  .panel>h3{font-size:10px;padding:8px 10px}
+  .panel .body{padding:8px 10px}
+  .tcard{width:58px;min-height:64px}
+  .tcard .sym{font-size:16px}
+  .tcard .nm{font-size:8px}
+  .die{width:34px;height:34px}
+  .sw{width:44px;height:44px}
+}
+@media (max-width:390px){
+  .brand b{font-size:15px}
+  .turnbox b{font-size:10px}
+  .phase{padding:4px 5px;font-size:8px}
+  .btn{padding:6px 8px;font-size:10.5px;min-height:38px}
+  .btn.sm{padding:5px 7px;font-size:10px;min-height:34px}
+  .sw{width:40px;height:40px}
+}
+@media (min-width:768px) and (max-width:1180px){
+  .stage{grid-template-columns:240px minmax(0,1fr) 280px}
+  .brand b{font-size:19px}
+}
+@media (max-height:450px) and (orientation:landscape){
+  .topbar{padding:4px 10px}
+  .bottombar{padding:4px 10px}
+  .brand b{font-size:16px}
+  .phase{padding:4px 8px;font-size:9px}
+  .panel>h3{padding:6px 10px;font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (hover:none){
+  .terr:hover .tp{stroke:rgba(4,8,14,.85);stroke-width:1.6}
+  .terr:active .tp{stroke:#fff;stroke-width:2.4}
+  .btn:hover{background:rgba(255,255,255,.03)}
+  .btn:active{background:rgba(200,155,60,.15)}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="brand"><b>WAR</b><span>Estratégia</span></div>
+    <div class="turnbox">
+      <i class="dot" id="curDot"></i>
+      <b id="curName">—</b>
+      <small id="roundLbl">Rodada 1</small>
+    </div>
+    <div class="phases">
+      <div class="phase" data-p="reforco">Reforço</div>
+      <div class="phase" data-p="ataque">Ataque</div>
+      <div class="phase" data-p="remanejar">Remanejar</div>
+    </div>
+    <div class="tools">
+      <button class="btn icon" id="btnSound" title="Som">🔊</button>
+      <button class="btn" id="btnRules">Regras</button>
+      <button class="btn bad" id="btnNew">Novo</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="btn sm" data-tab="left">Exércitos</button>
+    <button class="btn sm" data-tab="map">Mapa</button>
+    <button class="btn sm" data-tab="right">Comando</button>
+  </div>
+  <div class="stage">
+    <div class="col left" id="colLeft">
+      <div class="panel"><h3>Forças <span class="tag" id="tagAlive"></span></h3><div class="body" id="players"></div></div>
+      <div class="panel grow"><h3>Continentes</h3><div class="body" id="conts"></div></div>
+    </div>
+    <div class="mapwrap" id="mapwrap">
+      <svg id="map" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="maphint" id="maphint">Arraste · Pinça para zoom</div>
+      <div class="zoomctl">
+        <button class="btn" id="zIn">＋</button>
+        <button class="btn" id="zOut">−</button>
+        <button class="btn" id="zRst">⟳</button>
+      </div>
+      <div id="tooltip"></div>
+    </div>
+    <div class="col right" id="colRight">
+      <div class="panel"><h3>Objetivo <span class="tag" id="tagObjMode"></span></h3><div class="body obj" id="objective"></div></div>
+      <div class="panel"><h3>Cartas <span class="tag" id="tagCards"></span></h3>
+        <div class="body">
+          <div class="hand" id="hand"></div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap">
+            <button class="btn sm primary" id="btnTrade" disabled>Trocar</button>
+            <span id="tradeInfo" style="font-size:11px;color:var(--muted)"></span>
+          </div>
+        </div>
+      </div>
+      <div class="panel grow"><h3>Diário</h3><div class="body log" id="log"></div></div>
+    </div>
+  </div>
+  <div class="bottombar">
+    <div id="hint">Preparando…</div>
+    <div class="reinf" id="reinfBox" hidden><b id="reinfN">0</b><span>exércitos</span></div>
+    <div class="actions" id="actions"></div>
+  </div>
+</div>
+
+<!-- MODAIS -->
+<div class="backdrop" id="mSetup"><div class="modal wide">
+  <header><h2>Ordem de batalha</h2><p>Configure a partida.<br><span id="setupCount" style="color:var(--brass)"></span></p></header>
+  <div class="content">
+    <div class="grid2">
+      <div>
+        <div class="field"><span>Jogadores</span><select id="setPlayers"><option>3</option><option selected>4</option><option>5</option><option>6</option></select></div>
+        <div class="field"><span>Sua cor</span><div class="swatches" id="setColors"></div></div>
+        <div class="field"><span>Nome</span><input type="text" id="setName" value="Comandante" maxlength="18"></div>
+      </div>
+      <div>
+        <div class="field"><span>Vitória</span><select id="setObjMode"><option value="secreto" selected>Objetivo secreto</option><option value="conquista">Conquista total</option></select></div>
+        <div class="field"><span>Opções</span>
+          <label class="chk"><input type="checkbox" id="setPowers" checked> Cartas de estratégia</label>
+          <label class="chk"><input type="checkbox" id="setMin3" checked> Mín. 3 exércitos/rodada</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer><button class="btn primary" id="btnStart">Iniciar guerra</button></footer>
+</div></div>
+
+<div class="backdrop" id="mBattle"><div class="modal">
+  <header><h2>Combate</h2><p id="battleSub"></p></header>
+  <div class="content">
+    <div class="duel">
+      <div class="side" id="sideA"></div>
+      <div class="vs">×</div>
+      <div class="side" id="sideD"></div>
+    </div>
+    <div class="odds">Chance: <b id="oddsN">—</b><div class="oddsbar"><i id="oddsBar"></i></div></div>
+    <div class="blog" id="blog"></div>
+  </div>
+  <footer>
+    <button class="btn" id="btnRetreat">Recuar</button>
+    <button class="btn good" id="btnBlitz">Ataque total</button>
+    <button class="btn primary" id="btnRoll">Rolar dados</button>
+  </footer>
+</div></div>
+
+<div class="backdrop" id="mMove"><div class="modal slim">
+  <header><h2 id="moveTitle">Mover</h2><p id="moveSub"></p></header>
+  <div class="content">
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="reinf"><b id="moveN">1</b></span>
+      <input type="range" id="moveRange" min="1" max="3" value="1">
+    </div>
+  </div>
+  <footer><button class="btn" id="moveCancel">Cancelar</button><button class="btn primary" id="moveOk">Confirmar</button></footer>
+</div></div>
+
+<div class="backdrop" id="mRules"><div class="modal wide">
+  <header><h2>Regras</h2></header>
+  <div class="content" id="rulesBody"></div>
+  <footer><button class="btn primary" id="rulesClose">Fechar</button></footer>
+</div></div>
+
+<div class="backdrop" id="mVictory"><div class="modal">
+  <header><h2 id="vTitle">Fim da guerra</h2></header>
+  <div class="content" id="vBody"></div>
+  <footer><button class="btn primary" id="vNew">Nova partida</button></footer>
+</div></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+/* ============ DADOS ============ */
+const CONTS = {
+  na:{n:'América do Norte', bonus:5, color:'#e29a55', label:[236,80]},
+  sa:{n:'América do Sul',   bonus:2, color:'#63c795', label:[340,640]},
+  eu:{n:'Europa',           bonus:5, color:'#7aa8ff', label:[780,140]},
+  af:{n:'África',           bonus:3, color:'#d8bd5f', label:[780,440]},
+  as:{n:'Ásia',             bonus:7, color:'#e0778a', label:[1180,180]},
+  oc:{n:'Oceania',          bonus:2, color:'#79cccb', label:[1380,640]}
+};
+const TERRS = [
+ {id:'alasca',n:'Alasca',c:'na'},{id:'mackenzie',n:'Mackenzie',c:'na'},{id:'groenlandia',n:'Groenlândia',c:'na'},
+ {id:'vancouver',n:'Vancouver',c:'na'},{id:'ottawa',n:'Ottawa',c:'na'},{id:'labrador',n:'Labrador',c:'na'},
+ {id:'california',n:'Califórnia',c:'na'},{id:'novayork',n:'Nova York',c:'na'},{id:'mexico',n:'México',c:'na'},
+ {id:'venezuela',n:'Venezuela',c:'sa'},{id:'peru',n:'Peru',c:'sa'},{id:'brasil',n:'Brasil',c:'sa'},{id:'argentina',n:'Argentina',c:'sa'},
+ {id:'islandia',n:'Islândia',c:'eu'},{id:'inglaterra',n:'Inglaterra',c:'eu'},{id:'suecia',n:'Suécia',c:'eu'},
+ {id:'alemanha',n:'Alemanha',c:'eu'},{id:'polonia',n:'Polônia',c:'eu'},{id:'franca',n:'França',c:'eu'},{id:'moscou',n:'Moscou',c:'eu'},
+ {id:'argelia',n:'Argélia',c:'af'},{id:'egito',n:'Egito',c:'af'},{id:'sudao',n:'Sudão',c:'af'},
+ {id:'congo',n:'Congo',c:'af'},{id:'africadosul',n:'África do Sul',c:'af'},{id:'madagascar',n:'Madagascar',c:'af'},
+ {id:'omsk',n:'Omsk',c:'as'},{id:'dudinka',n:'Dudinka',c:'as'},{id:'siberia',n:'Sibéria',c:'as'},
+ {id:'vladivostok',n:'Vladivostok',c:'as'},{id:'tchita',n:'Tchita',c:'as'},{id:'mongolia',n:'Mongólia',c:'as'},
+ {id:'japao',n:'Japão',c:'as'},{id:'aral',n:'Aral',c:'as'},{id:'orientemedio',n:'Oriente Médio',c:'as'},
+ {id:'india',n:'Índia',c:'as'},{id:'vietna',n:'Vietnã',c:'as'},{id:'china',n:'China',c:'as'},
+ {id:'sumatra',n:'Sumatra',c:'oc'},{id:'borneu',n:'Bornéu',c:'oc'},{id:'novaguine',n:'Nova Guiné',c:'oc'},{id:'australia',n:'Austrália',c:'oc'}
+];
+const SYMS = {Q:'■', C:'●', T:'▲', W:'★'};
+TERRS.forEach((t,i)=>{ t.s = ['Q','C','T'][i%3]; });
+const ADJ = {
+  alasca:['mackenzie','vancouver','siberia'],mackenzie:['alasca','vancouver','ottawa','groenlandia'],
+  groenlandia:['mackenzie','ottawa','labrador','islandia'],vancouver:['alasca','mackenzie','ottawa','california'],
+  ottawa:['mackenzie','groenlandia','vancouver','california','novayork','labrador'],labrador:['groenlandia','ottawa','novayork'],
+  california:['vancouver','ottawa','novayork','mexico'],novayork:['ottawa','labrador','california','mexico'],
+  mexico:['california','novayork','venezuela'],venezuela:['mexico','brasil','peru'],
+  peru:['venezuela','brasil','argentina'],brasil:['venezuela','peru','argentina','argelia'],argentina:['peru','brasil'],
+  islandia:['groenlandia','inglaterra','suecia'],inglaterra:['islandia','suecia','alemanha','franca'],
+  suecia:['islandia','inglaterra','moscou'],alemanha:['inglaterra','franca','polonia'],
+  polonia:['alemanha','franca','moscou','egito'],franca:['inglaterra','alemanha','polonia','argelia'],
+  moscou:['suecia','polonia','omsk','aral','orientemedio'],argelia:['brasil','franca','egito','sudao','congo'],
+  egito:['argelia','polonia','orientemedio','sudao'],sudao:['argelia','egito','congo','africadosul','madagascar'],
+  congo:['argelia','sudao','africadosul'],africadosul:['congo','sudao','madagascar'],madagascar:['sudao','africadosul'],
+  omsk:['moscou','dudinka','mongolia','china','aral'],dudinka:['omsk','siberia','tchita','mongolia'],
+  siberia:['alasca','dudinka','tchita','vladivostok'],vladivostok:['siberia','tchita','japao'],
+  tchita:['dudinka','siberia','vladivostok','mongolia','china'],mongolia:['omsk','dudinka','tchita','china','japao'],
+  japao:['vladivostok','mongolia','china'],aral:['moscou','omsk','china','india','orientemedio'],
+  orientemedio:['moscou','aral','india','egito'],india:['aral','orientemedio','china','vietna'],
+  vietna:['india','china','sumatra'],china:['omsk','mongolia','tchita','japao','aral','india','vietna'],
+  sumatra:['vietna','borneu','australia'],borneu:['sumatra','novaguine','australia'],
+  novaguine:['borneu','australia'],australia:['sumatra','borneu','novaguine']
+};
+Object.keys(ADJ).forEach(a=>ADJ[a].forEach(b=>{ if(!ADJ[b].includes(a)) ADJ[b].push(a); }));
+const SEA = new Set(['alasca|siberia','groenlandia|islandia','brasil|argelia','franca|argelia','polonia|egito','egito|orientemedio','mexico|venezuela','vietna|sumatra','japao|vladivostok','madagascar|sudao','madagascar|africadosul','inglaterra|franca','islandia|suecia','islandia|inglaterra','japao|mongolia','japao|china','sumatra|australia','borneu|australia','novaguine|australia','sumatra|borneu']);
+const COLORS = [
+  {id:'azul',n:'Azul',hex:'#4a86e8'},{id:'vermelho',n:'Vermelho',hex:'#d84a3c'},
+  {id:'amarelo',n:'Amarelo',hex:'#e0b430'},{id:'verde',n:'Verde',hex:'#48a86b'},
+  {id:'preto',n:'Preto',hex:'#37404f'},{id:'branco',n:'Branco',hex:'#dcd8cb'}
+];
+const AI_NAMES = ['Vasari','Kessler','Aldana','Rowan','Bexiga','Marchetti','Okonkwo','Sarraf','Delacroix','Halvorsen','Quintana','Iwasaki','Tavares','Brennan','Novaes','Ferrand','Dagenais','Sarmiento','Ashworth','Kovacs','Bittencourt','Radulescu','Amorim','Vasilenko'];
+const PERSONAS = {
+  pacifico:{n:'Pacífico',thr:.70,greed:.55,fort:1.7,objW:.9,maxAtk:6,desc:'Evita combate.'},
+  agressor:{n:'Agressivo',thr:.42,greed:1.5,fort:.7,objW:1.9,maxAtk:28,desc:'Ataca cedo.'},
+  mediano:{n:'Mediano',thr:.56,greed:1.0,fort:1.0,objW:1.2,maxAtk:14,desc:'Equilibrado.'},
+  oportunista:{n:'Oportunista',thr:.52,greed:1.2,fort:.9,objW:1.1,maxAtk:18,desc:'Devora o fraco.'},
+  defensivo:{n:'Defensivo',thr:.65,greed:.8,fort:1.45,objW:1.0,maxAtk:9,desc:'Muralhas primeiro.'},
+  estrategista:{n:'Estrategista',thr:.55,greed:1.0,fort:1.15,objW:2.0,maxAtk:16,desc:'Foco no objetivo.'}
+};
+const LEVELS = {
+  facil:{n:'Recruta',noise:.78,blunder:.32,expo:0,guard:0,powerUse:.30,trade:.40,fortifyQ:.35,hunt:false},
+  normal:{n:'Oficial',noise:.16,blunder:.05,expo:.75,guard:.7,powerUse:.85,trade:.90,fortifyQ:.90,hunt:false},
+  dificil:{n:'Marechal',noise:.04,blunder:0,expo:1,guard:1,powerUse:1.0,trade:1.0,fortifyQ:1.0,hunt:true}
+};
+function levelPool(nAI){const base=['facil','normal','dificil'];const out=[];for(let i=0;i<nAI;i++)out.push(base[i%3]);return shuffle(out);}
+function personaPool(nAI){const core=shuffle(['pacifico','agressor','mediano']);const extra=shuffle(['oportunista','defensivo','estrategista']);const out=core.slice(0,Math.min(3,nAI));while(out.length<nAI)out.push(extra.pop());return shuffle(out);}
+const OBJ_BASE = [
+  {id:'o1',type:'cont',conts:['eu','oc'],extra:1,txt:'Conquistar EUROPA, OCEANIA + 1 continente.'},
+  {id:'o2',type:'cont',conts:['as','sa'],extra:0,txt:'Conquistar ÁSIA e AMÉRICA DO SUL.'},
+  {id:'o3',type:'cont',conts:['eu','sa'],extra:1,txt:'Conquistar EUROPA, AMÉRICA DO SUL + 1.'},
+  {id:'o4',type:'terr',count:18,min:2,txt:'18 TERRITÓRIOS com 2+ exércitos cada.'},
+  {id:'o5',type:'cont',conts:['na','af'],extra:0,txt:'Conquistar AMÉRICA DO NORTE e ÁFRICA.'},
+  {id:'o6',type:'terr',count:24,min:1,txt:'24 TERRITÓRIOS à sua escolha.'},
+  {id:'o7',type:'cont',conts:['na','oc'],extra:0,txt:'Conquistar AMÉRICA DO NORTE e OCEANIA.'},
+  {id:'o8',type:'cont',conts:['as','af'],extra:0,txt:'Conquistar ÁSIA e ÁFRICA.'}
+];
+function destroyObjs(colorIds){return colorIds.map(cid=>{const c=COLORS.find(x=>x.id===cid);return{id:'d_'+cid,type:'destroy',color:cid,txt:'Destruir '+c.n.toUpperCase()+'. Se falhar, 24 territórios.'};});}
+const POWERS = [
+  {id:'artilharia',ico:'🎯',n:'Artilharia',d:'4 dados, usa 3 melhores.',phase:'ataque'},
+  {id:'muralha',ico:'🛡️',n:'Muralha',d:'+1 defesa.',phase:'any'},
+  {id:'ponte',ico:'✈️',n:'Ponte Aérea',d:'Mova 5 ex. não-adjacentes.',phase:'remanejar'},
+  {id:'espionagem',ico:'🔍',n:'Espionagem',d:'Revela objetivo.',phase:'any'},
+  {id:'sabotagem',ico:'💣',n:'Sabotagem',d:'Remove 2 ex. inimigos.',phase:'any'},
+  {id:'mobilizacao',ico:'⚑',n:'Mobilização',d:'+4 exércitos.',phase:'reforco'},
+  {id:'tregua',ico:'🕊️',n:'Trégua',d:'Imunidade 1 turno.',phase:'any'},
+  {id:'blitz',ico:'⚡',n:'Blitz',d:'+1 ex. em conquistas.',phase:'ataque'}
+];
+
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rnd=n=>Math.floor(Math.random()*n);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const SPD={rapido:.32,normal:1,lento:1.9};
+const wait=ms=>sleep(Math.round(ms*(SPD[S.settings?.speed||'normal']||1)));
+const T=id=>TERRS.find(t=>t.id===id);
+const byId={};TERRS.forEach(t=>byId[t.id]=t);
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;r=clamp(r,0,255);g=clamp(g,0,255);b=clamp(b,0,255);return'#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+
+/* ============ ÁUDIO ============ */
+let AC=null;
+function actx(){
+  if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
+  if(AC&&AC.state==='suspended'){AC.resume().catch(()=>{});}
+  return AC;
+}
+function tone(f,dur=.09,type='triangle',g0=.05,delay=0){
+  if(!S.settings.sound)return;
+  const c=actx();if(!c)return;
+  try{const t0=c.currentTime+delay;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(g0,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g);g.connect(c.destination);o.start(t0);o.stop(t0+dur+.02);}catch(e){}
+}
+const sfx={
+  click:()=>tone(520,.05,'square',.03),
+  place:()=>tone(320,.07,'triangle',.04),
+  dice:()=>{for(let i=0;i<5;i++)tone(160+rnd(500),.045,'square',.022,i*.045);},
+  hit:()=>{tone(150,.16,'sawtooth',.05);tone(90,.22,'sine',.05,.02);},
+  conq:()=>{[523,659,784].forEach((f,i)=>tone(f,.16,'triangle',.05,i*.07));},
+  lost:()=>{[392,311,233].forEach((f,i)=>tone(f,.18,'sine',.05,i*.08));},
+  win:()=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,.28,'triangle',.06,i*.13));},
+  turn:()=>tone(440,.1,'sine',.035)
+};
+
+/* ============ ESTADO ============ */
+const S={
+  settings:{speed:'normal',sound:true,links:true,names:true,odds:true,powers:true,min3:true,objMode:'secreto'},
+  players:[],order:[],turn:0,round:1,phase:'reforco',
+  terr:{},deck:[],discard:[],powerDeck:[],
+  epoch:0,reinf:0,placed:{},conquered:0,mustTrade:false,
+  srcUsed:new Set(),gotArmies:new Set(),
+  sel:null,gameOver:false,busy:false,
+  tradeCount:0,log:[],stats:[],geoData:null
+};
+const cur=()=>S.players[S.order[S.turn]];
+const me=()=>S.players.find(p=>!p.isAI);
+const owner=id=>S.players[S.terr[id].o];
+const armies=id=>S.terr[id].a;
+const isMine=(id,p)=>S.terr[id].o===p.i;
+const enemiesOf=(id,p)=>ADJ[id].filter(x=>S.terr[x].o!==p.i);
+const ownedBy=p=>TERRS.filter(t=>S.terr[t.id].o===p.i).map(t=>t.id);
+const contOwned=(p,c)=>TERRS.filter(t=>t.c===c).every(t=>S.terr[t.id].o===p.i);
+const contCount=(p,c)=>TERRS.filter(t=>t.c===c&&S.terr[t.id].o===p.i).length;
+
+const COUNTRY_TO_TERRITORY={
+  'USA':'california','CAN':'ottawa','MEX':'mexico','GRL':'groenlandia','ISL':'islandia',
+  'BRA':'brasil','ARG':'argentina','PER':'peru','VEN':'venezuela','COL':'venezuela',
+  'ECU':'peru','BOL':'peru','CHL':'argentina','PRY':'argentina','URY':'argentina',
+  'GUY':'venezuela','SUR':'venezuela','GUF':'venezuela',
+  'GBR':'inglaterra','IRL':'inglaterra','FRA':'franca','DEU':'alemanha','ITA':'franca',
+  'ESP':'franca','PRT':'franca','NLD':'alemanha','BEL':'alemanha','LUX':'alemanha',
+  'CHE':'franca','AUT':'alemanha','POL':'polonia','CZE':'polonia','SVK':'polonia',
+  'HUN':'polonia','SWE':'suecia','NOR':'suecia','FIN':'suecia','DNK':'suecia',
+  'RUS':'moscou','UKR':'moscou','BLR':'moscou','LTU':'moscou','LVA':'moscou',
+  'EST':'moscou','MDA':'moscou','ROU':'moscou','BGR':'moscou','GRC':'moscou',
+  'ALB':'moscou','MKD':'moscou','SRB':'moscou','BIH':'moscou','HRV':'moscou',
+  'SVN':'moscou','MNE':'moscou',
+  'DZA':'argelia','MAR':'argelia','TUN':'argelia','LBY':'argelia','MRT':'argelia',
+  'MLI':'argelia','NER':'argelia','TCD':'argelia','SEN':'argelia','GMB':'argelia',
+  'GNB':'argelia','GIN':'argelia','SLE':'argelia','LBR':'argelia','CIV':'argelia',
+  'GHA':'argelia','TGO':'argelia','BEN':'argelia','NGA':'argelia',
+  'EGY':'egito','SDN':'sudao','SSD':'sudao','ETH':'sudao','ERI':'sudao','SOM':'sudao',
+  'DJI':'sudao','KEN':'sudao','UGA':'sudao','RWA':'sudao','BDI':'sudao','TZA':'sudao',
+  'COD':'congo','COG':'congo','CAF':'congo','CMR':'congo','GNQ':'congo','GAB':'congo',
+  'AGO':'congo','ZMB':'congo','MWI':'congo','MOZ':'congo','NAM':'congo','BWA':'congo',
+  'ZWE':'congo','SWZ':'congo','LSO':'congo','ZAF':'africadosul','MDG':'madagascar',
+  'CHN':'china','MNG':'mongolia','JPN':'japao','PRK':'japao','KOR':'japao',
+  'IND':'india','PAK':'india','BGD':'india','LKA':'india','NPL':'india','BTN':'india','AFG':'india',
+  'VNM':'vietna','LAO':'vietna','KHM':'vietna','THA':'vietna','MMR':'vietna','MYS':'vietna',
+  'SGP':'vietna','IDN':'vietna','PHL':'vietna','BRN':'vietna','TLS':'vietna',
+  'KAZ':'aral','UZB':'aral','TKM':'aral','TJK':'aral','KGZ':'aral',
+  'TUR':'orientemedio','SYR':'orientemedio','IRQ':'orientemedio','IRN':'orientemedio',
+  'SAU':'orientemedio','YEM':'orientemedio','OMN':'orientemedio','ARE':'orientemedio',
+  'QAT':'orientemedio','BHR':'orientemedio','KWT':'orientemedio','JOR':'orientemedio',
+  'LBN':'orientemedio','ISR':'orientemedio','PSE':'orientemedio','CYP':'orientemedio',
+  'GEO':'orientemedio','ARM':'orientemedio','AZE':'orientemedio',
+  'AUS':'australia','NZL':'australia','PNG':'novaguine','FJI':'australia','SLB':'australia',
+  'VUT':'australia','NCL':'australia'
+};
+
+/* ============ COMBATE ============ */
+const _round=new Map();
+function roundProbs(a,d){
+  const key=a+':'+d;if(_round.has(key))return _round.get(key);
+  const keep=Math.min(3,a),cmp=Math.min(keep,d);
+  const res=new Array(cmp+1).fill(0);const A=[],D=[];
+  const enumDice=(n,acc,cb)=>{if(acc.length===n){cb(acc);return;}for(let v=1;v<=6;v++){acc.push(v);enumDice(n,acc,cb);acc.pop();}};
+  enumDice(a,[],r=>A.push([...r].sort((x,y)=>y-x).slice(0,3)));
+  enumDice(d,[],r=>D.push([...r].sort((x,y)=>y-x)));
+  const tot=A.length*D.length;
+  for(const ar of A)for(const dr of D){let loss=0;for(let i=0;i<cmp;i++)if(ar[i]<=dr[i])loss++;res[loss]++;}
+  for(let i=0;i<res.length;i++)res[i]/=tot;
+  _round.set(key,res);return res;
+}
+const _win=new Map();
+function pConquer(A,D){
+  if(D<=0)return 1;if(A<=1)return 0;if(A>60)A=60;if(D>60)D=60;
+  const key=A+'x'+D;if(_win.has(key))return _win.get(key);
+  const a=Math.min(3,A-1),d=Math.min(2,D),cmp=Math.min(a,d);
+  const pr=roundProbs(a,d);let p=0;
+  for(let i=0;i<=cmp;i++)if(pr[i]>0)p+=pr[i]*pConquer(A-i,D-(cmp-i));
+  _win.set(key,p);return p;
+}
+function rollDice(n){return Array.from({length:n},()=>1+rnd(6));}
+function resolveRound(A,D,mods={}){
+  const an=Math.min(mods.extraDie?4:3,A-1);
+  const dn=Math.min(2,D);
+  const aRaw=rollDice(an).sort((x,y)=>y-x);const aKept=aRaw.slice(0,3);
+  const dRaw=rollDice(dn).sort((x,y)=>y-x);const dEff=[...dRaw];
+  if(mods.wall&&dEff.length)dEff[0]=Math.min(7,dEff[0]+1);
+  const cmp=Math.min(aKept.length,dEff.length);
+  let aLoss=0,dLoss=0;const pairs=[];
+  for(let i=0;i<cmp;i++){if(aKept[i]>dEff[i]){dLoss++;pairs.push('a');}else{aLoss++;pairs.push('d');}}
+  return{aRaw,aKept,dRaw,dEff,aLoss,dLoss,pairs,cmp};
+}
+function buildDeck(){const d=TERRS.map(t=>({t:t.id,s:t.s}));d.push({t:null,s:'W'},{t:null,s:'W'});return shuffle(d);}
+function drawCard(){if(!S.deck.length){S.deck=shuffle(S.discard.splice(0));}return S.deck.pop()||null;}
+function drawPower(){if(!S.powerDeck.length)S.powerDeck=shuffle(POWERS.map(p=>p.id).concat(POWERS.map(p=>p.id)));return S.powerDeck.pop();}
+function tradeValue(n){const t=[4,6,8,10,12,15];return n<=6?t[n-1]:15+5*(n-6);}
+function isSet(cards){
+  if(cards.length!==3)return false;
+  const w=cards.filter(c=>c.s==='W').length;
+  const s=cards.filter(c=>c.s!=='W').map(c=>c.s);
+  if(w>=2)return true;const u=new Set(s);
+  if(w===1)return u.size===1||u.size===2;
+  return u.size===1||u.size===3;
+}
+function findSet(cards){
+  for(let i=0;i<cards.length;i++)for(let j=i+1;j<cards.length;j++)for(let k=j+1;k<cards.length;k++){
+    const c=[cards[i],cards[j],cards[k]];if(isSet(c))return c;
+  }return null;
+}
+function distributeTerritories(np){let ids=TERRS.map(t=>t.id);shuffle(ids);ids.forEach((id,i)=>{S.terr[id]={o:i%np,a:1};});}
+function assignObjectives(){
+  const inPlay=S.players.map(p=>p.color.id);
+  let pool=shuffle([...OBJ_BASE,...destroyObjs(inPlay)]);const used=new Set();
+  S.players.forEach(p=>{
+    let o=pool.find(x=>!used.has(x.id)&&!(x.type==='destroy'&&x.color===p.color.id));
+    if(!o)o=pool.find(x=>!used.has(x.id));used.add(o.id);p.obj=o;
+  });
+}
+
+/* ============ NEW GAME ============ */
+function newGame(cfg){
+  try{
+    S.epoch=(S.epoch||0)+1;const np=cfg.players;
+    Object.assign(S.settings,{powers:cfg.powers,min3:cfg.min3,objMode:cfg.objMode});
+    const otherColors=shuffle(COLORS.filter(c=>c.id!==cfg.colorId));
+    const names=shuffle([...AI_NAMES]);
+    const personas=personaPool(np-1);const levels=levelPool(np-1);
+    S.players=[];
+    S.players.push({i:0,name:cfg.name||'Comandante',color:COLORS.find(c=>c.id===cfg.colorId),isAI:false,cards:[],powers:[],alive:true,obj:null,eff:{},kills:0,conq:0,lost:0,battles:0});
+    for(let k=0;k<np-1;k++){
+      S.players.push({i:k+1,name:names[k],color:otherColors[k],isAI:true,persona:personas[k],level:levels[k],cards:[],powers:[],alive:true,obj:null,eff:{},kills:0,conq:0,lost:0,battles:0});
+    }
+    S.terr={};distributeTerritories(np);
+    S.deck=buildDeck();S.discard=[];S.powerDeck=shuffle(POWERS.map(p=>p.id).concat(POWERS.map(p=>p.id)));
+    S.tradeCount=0;S.round=1;S.gameOver=false;S.log=[];S.stats=[];
+    S.order=shuffle(S.players.map(p=>p.i));S.turn=0;
+    if(S.settings.objMode==='secreto')assignObjectives();
+    else S.players.forEach(p=>p.obj={id:'total',type:'total',txt:'Conquistar todos os 42 territórios.'});
+    logSys('A guerra começa. '+np+' exércitos, 42 territórios.');
+    logSys('Ordem: '+S.order.map(i=>S.players[i].name).join(' → '));
+    buildMap();render();startTurn();
+  }catch(e){
+    console.error('Erro em newGame:',e);
+    alert('Erro ao iniciar jogo: '+e.message);
+  }
+}
+
+function baseReinf(p){const t=ownedBy(p).length;let n=Math.floor(t/2);n=S.settings.min3?Math.max(3,n):Math.max(1,n);return n;}
+function contBonus(p){let b=0,list=[];Object.keys(CONTS).forEach(c=>{if(contOwned(p,c)){b+=CONTS[c].bonus;list.push(c);}});return{b,list};}
+function computeReinf(p){const{b}=contBonus(p);return baseReinf(p)+b;}
+function objectiveDone(p){
+  const o=p.obj;if(!o)return false;const owned=ownedBy(p);
+  if(owned.length===42)return true;
+  if(o.type==='total')return owned.length===42;
+  if(o.type==='cont'){if(!o.conts.every(c=>contOwned(p,c)))return false;if(!o.extra)return true;const others=Object.keys(CONTS).filter(c=>!o.conts.includes(c)).filter(c=>contOwned(p,c));return others.length>=o.extra;}
+  if(o.type==='terr'){if(o.min>1)return owned.filter(id=>armies(id)>=o.min).length>=o.count;return owned.length>=o.count;}
+  if(o.type==='destroy'){const tgt=S.players.find(x=>x.color.id===o.color);if(!tgt||tgt.i===p.i)return owned.length>=24;if(tgt.alive)return false;if(tgt.killedBy===p.i)return true;return owned.length>=24;}
+  return false;
+}
+function objectiveText(p){
+  const o=p.obj;if(!o)return'';
+  if(o.type!=='destroy')return o.txt;
+  const tgt=S.players.find(x=>x.color.id===o.color);
+  if(!tgt||tgt.i===p.i)return'Conquistar 24 territórios. (alvo fora do jogo)';
+  if(!tgt.alive&&tgt.killedBy!==p.i)return'Conquistar 24 territórios. (alvo eliminado por outro)';
+  return o.txt;
+}
+function checkVictory(){
+  if(S.gameOver)return false;
+  const alive=S.players.filter(p=>p.alive);
+  if(alive.length===1){endGame(alive[0],'Último exército.');return true;}
+  for(const p of S.players){if(!p.alive)continue;if(objectiveDone(p)){endGame(p,ownedBy(p).length===42?'Conquista total.':'Objetivo cumprido.');return true;}}
+  return false;
+}
+function eliminate(victim,killer){
+  victim.alive=false;victim.killedBy=killer.i;killer.kills++;
+  const stolen=victim.cards.splice(0);killer.cards.push(...stolen);
+  log(killer,'<em>eliminou</em> '+victim.name+(stolen.length?' e tomou '+stolen.length+' carta(s).':'.'));
+  sfx.lost();
+}
+const armiesOf=p=>TERRS.reduce((s,x)=>s+(S.terr[x.id].o===p.i?S.terr[x.id].a:0),0);
+function log(p,html){S.log.unshift({c:p?p.color.hex:null,html});if(S.log.length>220)S.log.pop();renderLog();}
+function logSys(html){S.log.unshift({c:null,html,sys:true});if(S.log.length>220)S.log.pop();renderLog();}
+
+/* ============ MAPA ============ */
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const svg=$('#map');
+let gWorld,gLinks,gTerr,gFx,view={k:1,x:0,y:0};
+
+function mercatorProject(lon,lat){
+  const x=(lon+180)*(1600/360);
+  const y=(180/Math.PI)*Math.log(Math.tan(Math.PI/4+(lat*Math.PI/180)/2));
+  const yMerc=450-y*(900/180);
+  return[x,yMerc];
+}
+function geoJSONtoPath(coordinates){
+  if(!coordinates||coordinates.length===0)return'';let d='';
+  for(const ring of coordinates){for(let i=0;i<ring.length;i++){const[x,y]=mercatorProject(ring[i][0],ring[i][1]);d+=(i===0?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';}d+='Z ';}
+  return d;
+}
+function calculateCentroid(geoData){
+  let totalX=0,totalY=0,count=0;
+  for(const feature of geoData){
+    if(feature.geometry.type==='Polygon'){for(const ring of feature.geometry.coordinates){for(const coord of ring){const[x,y]=mercatorProject(coord[0],coord[1]);totalX+=x;totalY+=y;count++;}}}
+    else if(feature.geometry.type==='MultiPolygon'){for(const polygon of feature.geometry.coordinates){for(const ring of polygon){for(const coord of ring){const[x,y]=mercatorProject(coord[0],coord[1]);totalX+=x;totalY+=y;count++;}}}}
+  }
+  return count>0?[totalX/count,totalY/count]:[800,450];
+}
+
+async function buildMap(){
+  svg.innerHTML='';
+  const defs=mk('defs');
+  defs.innerHTML='<radialGradient id="ocean" cx="50%" cy="8%" r="105%"><stop offset="0%" stop-color="#1a2c47"/><stop offset="55%" stop-color="#0a1220"/><stop offset="100%" stop-color="#04070d"/></radialGradient><pattern id="grat" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="rgba(150,180,215,.055)" stroke-width="1"/></pattern><filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000" flood-opacity=".55"/></filter>';
+  svg.appendChild(defs);
+  svg.appendChild(mk('rect',{width:1600,height:900,fill:'url(#ocean)'}));
+  svg.appendChild(mk('rect',{width:1600,height:900,fill:'url(#grat)'}));
+  gWorld=mk('g',{id:'world'});svg.appendChild(gWorld);
+  
+  try{
+    const response=await fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson');
+    const geoData=await response.json();S.geoData=geoData;
+    const territoryGeo={};TERRS.forEach(t=>territoryGeo[t.id]=[]);
+    for(const feature of geoData.features){
+      const iso=feature.properties.ISO_A3||feature.properties.ISO_A2;
+      const terrId=COUNTRY_TO_TERRITORY[iso];
+      if(terrId&&territoryGeo[terrId])territoryGeo[terrId].push(feature);
+    }
+    const gC=mk('g');
+    Object.keys(CONTS).forEach(c=>{const[x,y]=CONTS[c].label;const a=mk('text',{x,y,class:'clabel',fill:CONTS[c].color});a.textContent=CONTS[c].n;const b=mk('text',{x,y:y+18,class:'cbonus',fill:CONTS[c].color});b.textContent='+'+CONTS[c].bonus;gC.appendChild(a);gC.appendChild(b);});
+    gWorld.appendChild(gC);
+    gTerr=mk('g',{id:'terrs'});
+    TERRS.forEach(t=>{
+      const g=mk('g',{class:'terr','data-id':t.id});const features=territoryGeo[t.id];
+      if(features&&features.length>0){
+        let combinedPath='';
+        for(const feature of features){
+          if(feature.geometry.type==='Polygon')combinedPath+=geoJSONtoPath(feature.geometry.coordinates);
+          else if(feature.geometry.type==='MultiPolygon')for(const polygon of feature.geometry.coordinates)combinedPath+=geoJSONtoPath(polygon);
+        }
+        if(combinedPath)g.appendChild(mk('path',{class:'tp',d:combinedPath,filter:'url(#soft)'}));
+      }
+      const[cx,cy]=calculateCentroid(features||[]);t.k=[cx,cy];
+      const nm=mk('text',{class:'tn',x:cx,y:cy+20});nm.textContent=t.n;g.appendChild(nm);
+      const bg=mk('g',{class:'badge'});bg.appendChild(mk('circle',{cx:cx,cy:cy,r:14}));
+      const tx=mk('text',{x:cx,y:cy});tx.textContent='1';bg.appendChild(tx);g.appendChild(bg);
+      gTerr.appendChild(g);
+    });
+    gWorld.appendChild(gTerr);
+    gLinks=mk('g',{id:'links'});const done=new Set();
+    Object.keys(ADJ).forEach(a=>{if(!byId[a].k)return;ADJ[a].forEach(b=>{if(!byId[b].k)return;const key=[a,b].sort().join('|');if(done.has(key))return;done.add(key);const[x1,y1]=byId[a].k,[x2,y2]=byId[b].k;gLinks.appendChild(mk('line',{x1:x1,y1:y1,x2:x2,y2:y2,class:'link'+(SEA.has(key)?' sea':'')}));});});
+    gWorld.appendChild(gLinks);
+  }catch(error){
+    console.error('Erro GeoJSON:',error);logSys('Usando mapa simplificado.');
+    gTerr=mk('g',{id:'terrs'});
+    TERRS.forEach(t=>{const g=mk('g',{class:'terr','data-id':t.id});const cx=800+(Math.random()-.5)*1400;const cy=450+(Math.random()-.5)*700;t.k=[cx,cy];g.appendChild(mk('circle',{class:'tp',cx:cx,cy:cy,r:30}));const tx=mk('text',{class:'tn',x:cx,y:cy+20});tx.textContent=t.n;g.appendChild(tx);gTerr.appendChild(g);});
+    gWorld.appendChild(gTerr);
+  }
+  gFx=mk('g',{id:'fx'});gWorld.appendChild(gFx);
+  bindMap();applyView();
+}
+
+function applyView(){gWorld.setAttribute('transform',`translate(<LaTex>id_1</LaTex>{view.y}) scale(${view.k})`);}
+function zoomAt(cx,cy,factor){const k2=clamp(view.k*factor,.5,4);const f=k2/view.k;view.x=cx-(cx-view.x)*f;view.y=cy-(cy-view.y)*f;view.k=k2;applyView();}
+function svgPt(ev){const r=svg.getBoundingClientRect();const clientX=ev.clientX??(ev.touches?.[0]?.clientX??0);const clientY=ev.clientY??(ev.touches?.[0]?.clientY??0);const x=((clientX-r.left)/r.width)*1600;const y=((clientY-r.top)/r.height)*900;return[x,y];}
+
+let mapBound=false;
+function bindMap(){
+  if(mapBound)return;mapBound=true;
+  let drag=null,moved=0,downId=null;let pinch=null;let lastTap=0,lastTapPos=null;
+  function findTerrAt(clientX,clientY){const el=document.elementFromPoint(clientX,clientY);if(!el)return null;const g=el.closest?.('.terr');return g?g.dataset.id:null;}
+  
+  svg.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='touch'&&e.isPrimary===false)return;
+    e.preventDefault();const tid=findTerrAt(e.clientX,e.clientY);downId=tid;
+    drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y,pointerId:e.pointerId};moved=0;
+    svg.classList.add('dragging');try{svg.setPointerCapture(e.pointerId);}catch(err){}
+  },{passive:false});
+  
+  svg.addEventListener('pointermove',e=>{
+    if(pinch)return;if(!drag){hoverTerr(e);return;}e.preventDefault();
+    const r=svg.getBoundingClientRect(),sx=1600/r.width,sy=900/r.height;
+    const dx=(e.clientX-drag.x)*sx,dy=(e.clientY-drag.y)*sy;
+    moved=Math.max(moved,Math.abs(dx)+Math.abs(dy));view.x=drag.vx+dx;view.y=drag.vy+dy;applyView();
+  },{passive:false});
+  
+  function handlePointerUp(e){
+    if(!drag)return;svg.classList.remove('dragging');
+    try{svg.releasePointerCapture(drag.pointerId);}catch(err){}
+    if(moved<8&&downId){
+      const now=Date.now();const pos={x:e.clientX,y:e.clientY};
+      if(lastTap&&now-lastTap<300&&lastTapPos&&Math.hypot(pos.x-lastTapPos.x,pos.y-lastTapPos.y)<30){
+        const[cx,cy]=svgPt(e);zoomAt(cx,cy,1.5);lastTap=0;lastTapPos=null;
+      }else{onTerrClick(downId);lastTap=now;lastTapPos=pos;}
+    }
+    drag=null;downId=null;
+  }
+  svg.addEventListener('pointerup',handlePointerUp);
+  svg.addEventListener('pointercancel',e=>{drag=null;downId=null;svg.classList.remove('dragging');});
+  svg.addEventListener('pointerleave',e=>{if(!drag)hideTip();});
+  
+  let activeTouches=new Map();
+  svg.addEventListener('touchstart',e=>{
+    actx();
+    if(e.touches.length===2){
+      e.preventDefault();const t1=e.touches[0],t2=e.touches[1];
+      const dist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+      const cx=(t1.clientX+t2.clientX)/2;const cy=(t1.clientY+t2.clientY)/2;
+      pinch={startDist:dist,startK:view.k,cx,cy,startVx:view.x,startVy:view.y};drag=null;
+    }else if(e.touches.length===1){
+      if(!drag){const t=e.touches[0];const tid=findTerrAt(t.clientX,t.clientY);downId=tid;drag={x:t.clientX,y:t.clientY,vx:view.x,vy:view.y,pointerId:'touch'};moved=0;}
+    }
+  },{passive:false});
+  
+  svg.addEventListener('touchmove',e=>{
+    if(e.touches.length===2&&pinch){
+      e.preventDefault();const t1=e.touches[0],t2=e.touches[1];
+      const dist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+      const scale=dist/pinch.startDist;const newK=clamp(pinch.startK*scale,.5,4);
+      const cx=(t1.clientX+t2.clientX)/2;const cy=(t1.clientY+t2.clientY)/2;
+      const r=svg.getBoundingClientRect();const svgCx=((cx-r.left)/r.width)*1600;const svgCy=((cy-r.top)/r.height)*900;
+      const f=newK/pinch.startK;view.k=newK;
+      view.x=svgCx-(svgCx-pinch.startVx)*f+(cx-pinch.cx)*(1600/r.width);
+      view.y=svgCy-(svgCy-pinch.startVy)*f+(cy-pinch.cy)*(900/r.height);
+      applyView();
+    }else if(e.touches.length===1&&drag&&!pinch){
+      e.preventDefault();const t=e.touches[0];
+      const r=svg.getBoundingClientRect(),sx=1600/r.width,sy=900/r.height;
+      const dx=(t.clientX-drag.x)*sx,dy=(t.clientY-drag.y)*sy;
+      moved=Math.max(moved,Math.abs(dx)+Math.abs(dy));view.x=drag.vx+dx;view.y=drag.vy+dy;applyView();
+    }
+  },{passive:false});
+  
+  svg.addEventListener('touchend',e=>{
+    if(e.touches.length<2)pinch=null;
+    if(e.touches.length===0){if(drag&&moved<8&&downId)onTerrClick(downId);drag=null;downId=null;}
+  },{passive:false});
+  svg.addEventListener('touchcancel',e=>{pinch=null;drag=null;downId=null;});
+  
+  svg.addEventListener('wheel',e=>{e.preventDefault();const[cx,cy]=svgPt(e);zoomAt(cx,cy,e.deltaY<0?1.15:1/1.15);},{passive:false});
+  
+  $('#zIn').onclick=()=>zoomAt(800,450,1.3);
+  $('#zOut').onclick=()=>zoomAt(800,450,1/1.3);
+  $('#zRst').onclick=()=>{view={k:1,x:0,y:0};applyView();};
+  
+  document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+  document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+}
+
+const tip=$('#tooltip');
+function hideTip(){tip.classList.remove('on');}
+function hoverTerr(e){
+  if(e.pointerType==='touch')return;
+  const g=e.target.closest?.('.terr');if(!g){hideTip();return;}
+  const id=g.dataset.id,t=byId[id],st=S.terr[id],p=S.players[st.o];
+  const wrap=$('#mapwrap').getBoundingClientRect();let extra='';
+  if(S.settings.odds&&S.sel&&S.phase==='ataque'&&ADJ[S.sel].includes(id)&&st.o!==cur().i&&cur()===me()){
+    const pc=pConquer(armies(S.sel),st.a);extra=`<div class="r"><span>Chance</span><i><LaTex>id_2</LaTex>{t.n}</b><div class="r"><span><LaTex>id_3</LaTex>{SYMS[t.s]}</i></div><div class="r"><span>Ocupante</span><i style="color:<LaTex>id_4</LaTex>{p.name}</i></div><div class="r"><span>Exércitos</span><i><LaTex>id_5</LaTex>{ADJ[id].length}</i></div><LaTex>id_6</LaTex>{id}"] .tp`);if(!g)return;g.style.transition='none';g.style.filter='brightness(2.1)';setTimeout(()=>{g.style.transition='';g.style.filter='';},130);}
+
+/* ============ RENDER ============ */
+function render(){
+  const p=cur();
+  TERRS.forEach(t=>{
+    const g=gTerr?.querySelector(`[data-id="<LaTex>id_7</LaTex>{id}"]`);if(g)g.classList.add('pulse');});}
+    else if(S.phase==='ataque'){
+      if(S.sel){
+        const g=gTerr.querySelector(`[data-id="<LaTex>id_8</LaTex>{t.id}"]`);if(g){if(t.id!==S.sel&&!tg.includes(t.id))g.classList.add('dim');else if(tg.includes(t.id))g.classList.add('tgt');}});
+      }else{ownedBy(p).filter(id=>armies(id)>1&&enemiesOf(id,p).length).forEach(id=>{const g=gTerr.querySelector(`[data-id="<LaTex>id_9</LaTex>{S.sel}"]`);if(g)g.classList.add('sel');
+        const tg=ADJ[S.sel].filter(id=>isMine(id,p));
+        TERRS.forEach(t=>{const g=gTerr.querySelector(`[data-id="<LaTex>id_10</LaTex>{id}"]`);if(g)g.classList.add('pulse');});}
+    }
+  }
+  $('#curDot').style.background=p.color.hex;$('#curDot').style.color=p.color.hex;
+  $('#curName').textContent=p.isAI?p.name:p.name+' (você)';
+  $('#roundLbl').textContent='Rodada '+S.round;
+  $$('.phase').forEach(e=>e.classList.toggle('active',e.dataset.p===S.phase&&!S.gameOver));
+  renderPlayers();renderConts();renderObjective();renderHand();renderActions();
+}
+function renderPlayers(){
+  const box=$('#players');box.innerHTML='';const total=TERRS.length;
+  $('#tagAlive').textContent=S.players.filter(p=>p.alive).length+'/'+S.players.length;
+  S.order.forEach(idx=>{
+    const p=S.players[idx];const t=ownedBy(p).length;
+    const a=TERRS.reduce((s,x)=>s+(S.terr[x.id].o===p.i?S.terr[x.id].a:0),0);
+    const d=document.createElement('div');
+    d.className='prow'+(p===cur()&&!S.gameOver?' active':'')+(p.alive?'':' dead');
+    d.innerHTML=`<i class="dot" style="background:${p.color.hex}"></i><div class="nm"><LaTex>id_11</LaTex>{p.isAI?'':' <small>você</small>'}<LaTex>id_12</LaTex>{t}t · <LaTex>id_13</LaTex>{p.cards.length}🂠</div><div class="bar"><i style="width:<LaTex>id_14</LaTex>{p.color.hex}"></i></div>`;
+    box.appendChild(d);
+  });
+}
+function renderConts(){
+  const box=$('#conts');box.innerHTML='';
+  Object.keys(CONTS).forEach(c=>{
+    const total=TERRS.filter(t=>t.c===c).length;const holder=S.players.find(p=>p.alive&&contOwned(p,c));const mine=contCount(me(),c);
+    const d=document.createElement('div');d.className='crow'+(holder?' complete':'');
+    d.innerHTML=`<i class="swatch" style="background:${CONTS[c].color}"></i><span class="nm"><LaTex>id_15</LaTex>{mine}/<LaTex>id_16</LaTex>{CONTS[c].bonus}</span>`;
+    if(holder){d.title='Dominado por '+holder.name;d.querySelector('.own').style.color=holder.color.hex;d.querySelector('.own').textContent='●';}
+    box.appendChild(d);
+  });
+}
+function renderObjective(){$('#tagObjMode').textContent=S.settings.objMode==='secreto'?'sigiloso':'total';const p=me();$('#objective').innerHTML=`<div><LaTex>id_17</LaTex>('#hand');box.innerHTML='';$('#tagCards').textContent=p.cards.length+'/5';
+  p.cards.forEach((c,i)=>{
+    const owned=c.t&&S.terr[c.t].o===p.i;const d=document.createElement('div');
+    d.className='tcard'+(c._sel?' on':'')+(owned?' mine':'');
+    d.innerHTML=`<div class="sym">${SYMS[c.s]}</div><div class="nm"><LaTex>id_18</LaTex>('#btnTrade').disabled=!ok;
+  const nextVal=tradeValue(S.tradeCount+1);
+  $('#tradeInfo').innerHTML=p.cards.length>=5?`<span style="color:var(--rust)">Troca obrigatória.</span> Próxima: <b>${nextVal}</b>`:`Próxima: <b><LaTex>id_19</LaTex>('#log');if(!box)return;box.innerHTML=S.log.slice(0,90).map(l=>`<div class="logline<LaTex>id_20</LaTex>{l.c?`<i class="d" style="background:${l.c}"></i>`:'<i class="d" style="background:#4a5568"></i>'}<div>${l.html}</div></div>`).join('');}
+function setHint(h){$('#hint').innerHTML=h;}
+function renderActions(){
+  const box=$('#actions');box.innerHTML='';const p=cur();
+  $('#reinfBox').hidden=!(p===me()&&S.phase==='reforco'&&!S.gameOver);$('#reinfN').textContent=S.reinf;
+  if(S.gameOver){setHint('A guerra terminou.');return;}
+  if(p.isAI){setHint(`<b><LaTex>id_21</LaTex>{byId[S.sel].n}</b>. Toque em inimigo adjacente.`:'Toque em território SEU com <b>2+</b> exércitos.');
+    if(S.sel)add('Cancelar','',()=>{S.sel=null;render();});
+    add('Remanejar →','primary',()=>{S.phase='remanejar';S.sel=null;S.srcUsed=new Set();S.gotArmies=new Set();sfx.turn();render();});
+  }else if(S.phase==='remanejar'){
+    setHint(S.sel?`Movendo de <b><LaTex>id_22</LaTex>{byId[id].n}</b> (<LaTex>id_23</LaTex>{st.a}ex)`);
+      else if(st.o===p.i)setHint(`Sem inimigos adjacentes.`);
+      return;
+    }
+    if(id===S.sel){S.sel=null;render();return;}
+    if(st.o===p.i){if(st.a>=2&&enemiesOf(id,p).length>0){S.sel=id;sfx.click();render();setHint(`<b><LaTex>id_24</LaTex>{st.a}ex).`);}return;}
+    if(ADJ[S.sel].includes(id)){
+      if(p.eff.cannotAttack===st.o){setHint('Trégua ativa com '+S.players[st.o].name+'.');return;}
+      openBattle(S.sel,id);
+    }else setHint(`<b><LaTex>id_25</LaTex>{byId[S.sel].n} → <LaTex>id_26</LaTex>{n}</em> ex. de <LaTex>id_27</LaTex>{byId[id].n}.`);S.sel=null;sfx.place();render();});
+    }else if(st.o===p.i&&armies(id)>=2&&!S.srcUsed.has(id)&&!S.gotArmies.has(id)){S.sel=id;render();}
+  }
+}
+function shake(sel){const e=$(sel);if(!e)return;e.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:230});}
+function autoPlace(){
+  const p=me();while(S.reinf>0){
+    const cands=ownedBy(p).filter(id=>enemiesOf(id,p).length);const pool=cands.length?cands:ownedBy(p);
+    let best=pool[0],bs=-1e9;pool.forEach(id=>{const threat=enemiesOf(id,p).reduce((s,x)=>s+armies(x),0)-armies(id);const s=threat+(S.placed[id]||0)*-0.7+Math.random()*.4;if(s>bs){bs=s;best=id;}});
+    S.terr[best].a++;S.placed[best]=(S.placed[best]||0)+1;S.reinf--;
+  }sfx.place();render();
+}
+
+/* ✅ CORREÇÃO CRÍTICA: addEventListener para btnTrade */
+$('#btnTrade').addEventListener('click',()=>{
+  const p=me();const sel=p.cards.filter(c=>c._sel);
+  if(sel.length!==3||!isSet(sel))return;
+  doTrade(p,sel);render();
+});
+function doTrade(p,set){
+  S.tradeCount++;const val=tradeValue(S.tradeCount);let bonusTxt='';
+  set.forEach(c=>{if(c.t&&S.terr[c.t].o===p.i){S.terr[c.t].a+=2;bonusTxt+=` +2 em <LaTex>id_28</LaTex>{val}</em> ex.<LaTex>id_29</LaTex>('#moveTitle').textContent=title;$('#moveSub').textContent=sub;
+  const r=$('#moveRange');r.min=min;r.max=max;r.value=min;$('#moveN').textContent=min;
+  r.oninput=()=>$('#moveN').textContent=r.value;
+  $('#moveCancel').style.display=noCancel?'none':'';
+  moveCb=cb;$('#mMove').classList.add('on');
+}
+const askMoveP=(t,s,mn,mx)=>new Promise(res=>askMove(t,s,mn,mx,res,true));
+$('#moveOk').addEventListener('click',()=>{$('#mMove').classList.remove('on');const n=+$('#moveRange').value;if(moveCb)moveCb(n);moveCb=null;});
+$('#moveCancel').addEventListener('click',()=>{$('#mMove').classList.remove('on');moveCb=null;S.sel=null;render();});
+let B=null;
+function dieEl(v,def){
+  const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8],7:[0,1,2,6,7,8]};
+  const d=document.createElement('div');d.className='die'+(def?' def':'');
+  for(let i=0;i<9;i++){const s=document.createElement('span');if(PIPS[v].includes(i))s.className='pip';d.appendChild(s);}
+  return d;
+}
+function openBattle(from,to){
+  const a=cur(),d=S.players[S.terr[to].o];B={from,to,a,d};a._battleLossA=0;a._battleLossD=0;
+  $('#battleSub').innerHTML=`<b style="color:<LaTex>id_30</LaTex>{a.name}</b> ataca <b style="color:<LaTex>id_31</LaTex>{d.name}</b>`;
+  $('#blog').innerHTML='';const oldTag=$('#dTally');if(oldTag)oldTag.remove();
+  drawBattle();$('#mBattle').classList.add('on');
+}
+function drawBattle(rolls){
+  const{from,to,a,d}=B;const A=armies(from),D=armies(to);const mods=battleMods(a,d);
+  $('#sideA').innerHTML=`<div class="who">Atacante</div><div class="terr-nm" style="color:<LaTex>id_32</LaTex>{byId[from].n}</div><div class="armies"><b><LaTex>id_33</LaTex>('#sideD').innerHTML=`<div class="who">Defensor</div><div class="terr-nm" style="color:<LaTex>id_34</LaTex>{byId[to].n}</div><div class="armies"><b><LaTex>id_35</LaTex>('#oddsN').textContent=(pc*100).toFixed(0)+'%';$('#oddsBar').style.width=(pc*100)+'%';
+  let note='';if(mods.extraDie)note+=' 🎯 4 dados';if(mods.wall)note+=' 🛡️ defesa';
+  $('#battleSub').innerHTML=`<b style="color:<LaTex>id_36</LaTex>{a.name}</b> ataca <b style="color:<LaTex>id_37</LaTex>{d.name}</b><LaTex>id_38</LaTex>('#btnRoll').disabled=A<2;$('#btnBlitz').disabled=A<2;
+  if(rolls){
+    const dA=$('#dA'),dD=$('#dD');
+    rolls.aRaw.forEach((v,i)=>{const e=dieEl(v,false);e.classList.add('settle');if(i>=3)e.classList.add('faded');dA.appendChild(e);});
+    rolls.dRaw.forEach(v=>{const e=dieEl(v,true);e.classList.add('settle');dD.appendChild(e);});
+    for(let i=0;i<rolls.cmp;i++){const ae=dA.children[i],de=dD.children[i];if(rolls.pairs[i]==='a'){ae.classList.add('win');de.classList.add('lose');}else{ae.classList.add('lose');de.classList.add('win');}}
+    const tag=$('#dTally')||(()=>{const e=document.createElement('div');e.id='dTally';e.className='roundtag';$('.odds').after(e);return e;})();
+    tag.textContent=`Atacante -${a._battleLossA||0} · Defensor -<LaTex>id_39</LaTex>('#btnRoll').disabled=true;$('#btnBlitz').disabled=true;
+  const mods=battleMods(a,d);const r=resolveRound(armies(from),armies(to),mods);
+  drawBattle();const dA=$('#dA'),dD=$('#dD');
+  const nA=Math.min(mods.extraDie?4:3,armies(from)-1),nD=Math.min(2,armies(to));
+  for(let i=0;i<nA;i++){const e=dieEl(1+rnd(6),false);e.classList.add('rolling');dA.appendChild(e);}
+  for(let i=0;i<nD;i++){const e=dieEl(1+rnd(6),true);e.classList.add('rolling');dD.appendChild(e);}
+  sfx.dice();await wait(520);a.eff.artilharia=false;
+  S.terr[from].a-=r.aLoss;S.terr[to].a-=r.dLoss;
+  a.battles++;a.lost+=r.aLoss;d.lost+=r.dLoss;
+  a._battleLossA=(a._battleLossA||0)+r.aLoss;a._battleLossD=(a._battleLossD||0)+r.dLoss;
+  drawBattle(r);if(r.dLoss)sfx.hit();
+  const bl=$('#blog');bl.insertAdjacentHTML('afterbegin',`<div>🔴 <LaTex>id_40</LaTex>{r.dEff.join(' ')} → atacante -<LaTex>id_41</LaTex>{r.dLoss}</div>`);
+  render();if(armies(to)===0){await conquer(from,to,a,d,r);return true;}
+  S.busy=false;$('#btnRoll').disabled=armies(from)<2;$('#btnBlitz').disabled=armies(from)<2;renderActions();return false;
+}
+function applyConquest(from,to,a,d,n){S.terr[from].a-=n;S.terr[to].a=n+(a.eff.blitz?1:0);if(ownedBy(d).length===0)eliminate(d,a);}
+async function conquer(from,to,a,d,r){
+  ripple(to,a.color.hex);sfx.conq();
+  const maxMove=Math.min(3,armies(from)-1);const dice=r?r.aKept.length:1;const minMove=clamp(Math.min(3,dice),1,maxMove);
+  S.terr[to].o=a.i;S.terr[to].a=0;S.conquered++;a.conq++;
+  log(a,`conquistou <em><LaTex>id_42</LaTex>{d.name}.`);
+  let n;
+  if(a===me()){$('#mBattle').classList.remove('on');await sleep(140);n=maxMove>minMove?await askMoveP('Ocupar',`De ${byId[from].n} para <LaTex>id_43</LaTex>('#btnRoll').addEventListener('click',()=>{battleRound();});
+$('#btnBlitz').addEventListener('click',async()=>{
+  S.busy=true;
+  while(B&&armies(B.from)>=2&&S.terr[B.to].o!==B.a.i&&!S.gameOver){const done=await battleRound();if(done)break;await wait(180);}
+  S.busy=false;renderActions();
+});
+$('#btnRetreat').addEventListener('click',()=>{$('#mBattle').classList.remove('on');S.busy=false;S.sel=null;B=null;render();});
+function beginTurn(p){
+  S.phase='reforco';S.sel=null;S.conquered=0;S.placed={};S.srcUsed=new Set();S.gotArmies=new Set();
+  p.eff.wall=false;p.eff.blitz=false;p.eff.artilharia=false;
+  S.reinf=computeReinf(p)+(p.pendingReinf||0);p.pendingReinf=0;
+  S.mustTrade=!p.isAI&&p.cards.length>=5;sfx.turn();
+  const{b,list}=contBonus(p);
+  logSys(`— turno de <b style="color:${p.color.hex}"><LaTex>id_44</LaTex>{S.reinf} exércitos`+(b?` (+<LaTex>id_45</LaTex>{list.map(c=>CONTS[c].n).join(', ')})`:'')+' —');
+}
+async function runTurn(){
+  if(S.gameOver)return;const epoch=S.epoch;const p=cur();
+  if(!p.alive){advance();return;}
+  beginTurn(p);render();
+  if(p.isAI){S.busy=true;render();await aiTurn(p);if(S.epoch!==epoch)return;S.busy=false;if(S.gameOver){render();return;}concludeTurn();}
+}
+function startTurn(){runTurn();}
+function advance(){
+  if(S.gameOver)return;let guard=0;
+  do{S.turn=(S.turn+1)%S.order.length;if(S.turn===0){S.round++;if(S.round>120){endGame(S.players.filter(p=>p.alive).sort((a,b)=>ownedBy(b).length-ownedBy(a).length)[0],'Armistício.');return;}}}while(!cur().alive&&++guard<20);
+  runTurn();
+}
+function concludeTurn(){
+  const p=cur();
+  if(S.conquered>0){const c=drawCard();if(c){p.cards.push(c);log(p,'recebeu uma carta.');}}
+  p.eff.blitz=false;p.eff.artilharia=false;p.eff.cannotAttack=undefined;S.sel=null;
+  if(checkVictory()){render();return;}
+  advance();
+}
+function endTurn(){concludeTurn();}
+const threat=(id,p)=>enemiesOf(id,p).reduce((s,x)=>s+armies(x),0);
+const contTotal=c=>TERRS.filter(t=>t.c===c).length;
+function contPressure(p,c){return contCount(p,c)/contTotal(c);}
+function objWeightTerr(p,id){
+  const o=p.obj;if(!o)return.5;const t=byId[id];
+  if(o.type==='cont')return o.conts.includes(t.c)?2.4:.3;
+  if(o.type==='terr')return 1;if(o.type==='total')return 1;
+  if(o.type==='destroy'){const tgt=S.players.find(x=>x.color.id===o.color);if(tgt&&tgt.alive&&tgt.i!==p.i&&S.terr[id].o===tgt.i)return 2.8;return.6;}
+  return.5;
+}
+function aiTrade(p,L){
+  let guard=0;while(p.cards.length>=3&&guard++<5){
+    const set=findSet(p.cards);if(!set)break;const forced=p.cards.length>=5;
+    if(!forced){const val=tradeValue(S.tradeCount+1);const want=Math.random()<L.trade&&(val>=8||p.cards.length>=4||L.hunt);if(!want)break;}
+    doTrade(p,set);
+  }
+}
+async function aiPlace(p,K,L){
+  let guard=0;while(S.reinf>0&&guard++<60){
+    const own=ownedBy(p);const borders=own.filter(id=>enemiesOf(id,p).length);const pool=borders.length?borders:own;
+    let best=pool[0],bs=-1e9;pool.forEach(id=>{const t=byId[id];let s=threat(id,p)-armies(id)*.55;s+=objWeightTerr(p,id)*1.6*K.objW;const cp=contPressure(p,t.c);s+=cp*cp*3.2*K.greed;if(contOwned(p,t.c))s+=1.2;s+=(Math.random()-.5)*L.noise*4;if(s>bs){bs=s;best=id;}});
+    const chunk=Math.min(S.reinf,Math.max(1,Math.ceil(S.reinf/3)));S.terr[best].a+=chunk;S.reinf-=chunk;flash(best);render();await wait(150);
+  }
+}
+async function aiAttack(p,K,L){
+  const thr=K.thr;const armOf=q=>ownedBy(q).reduce((s,id)=>s+armies(id),0);let atks=0;const maxAtk=K.maxAtk;
+  while(atks<maxAtk&&!S.gameOver){
+    const cands=[];ownedBy(p).filter(id=>armies(id)>=2).forEach(from=>{
+      enemiesOf(from,p).forEach(to=>{
+        const dOwner=S.players[S.terr[to].o];if(p.eff.cannotAttack===dOwner.i)return;
+        const A=armies(from),D=armies(to),pc=pConquer(A,D),t=byId[to];let val=1;
+        val+=objWeightTerr(p,to)*1.5*K.objW;val+=contPressure(p,t.c)*2.2*K.greed;
+        if(contCount(p,t.c)===contTotal(t.c)-1)val+=3.6;if(contOwned(dOwner,t.c))val+=1.8;
+        if(ownedBy(dOwner).length===1)val+=2.4;if(!S.conquered)val+=1.4;
+        const expo=ADJ[to].filter(x=>x!==from&&S.terr[x].o!==p.i).reduce((s,x)=>s+armies(x),0);
+        let score=pc*val-(1-pc)*(1.1/K.greed)-L.expo*expo*.055;score+=(Math.random()-.5)*L.noise*2.2;
+        cands.push({from,to,pc,score,val,owner:dOwner});
+      });
+    });
+    if(!cands.length)break;const mine=armOf(p);const baseNeed=S.conquered?thr:Math.min(thr,.34);
+    cands.forEach(c=>{let need=baseNeed;if(mine>armOf(c.owner)*1.8)need-=.10;if(ownedBy(c.owner).length===1)need-=.06;c.need=Math.max(.20,need);});
+    const viable=cands.filter(c=>c.pc>=c.need);if(!viable.length)break;
+    viable.sort((a,b)=>b.score-a.score);let pick=viable[0];
+    if(L.blunder&&Math.random()<L.blunder&&viable.length>1)pick=viable[1+rnd(Math.min(3,viable.length-1))];
+    await aiBattle(p,pick.from,pick.to,L);atks++;if(S.gameOver)return;render();await wait(190);
+  }
+}
+async function aiBattle(p,from,to,L){
+  const d=S.players[S.terr[to].o];let guard=0;
+  while(armies(from)>=2&&S.terr[to].o!==p.i&&guard++<80&&!S.gameOver){
+    const mods={extraDie:!!p.eff.artilharia,wall:!!d.eff.wall};const r=resolveRound(armies(from),armies(to),mods);
+    p.eff.artilharia=false;S.terr[from].a-=r.aLoss;S.terr[to].a-=r.dLoss;
+    p.battles++;p.lost+=r.aLoss;d.lost+=r.dLoss;flash(to);sfx.dice();
+    if(armies(to)<=0){
+      const maxMove=Math.min(3,armies(from)-1);const minMove=clamp(Math.min(3,r.aKept.length),1,maxMove);const n=maxMove;
+      S.terr[to].o=p.i;S.terr[to].a=0;S.conquered++;p.conq++;
+      log(p,`conquistou <em><LaTex>id_46</LaTex>{d.name}.`);applyConquest(from,to,p,d,n);
+      ripple(to,p.color.hex);sfx.conq();render();checkVictory();return;
+    }
+    if(pConquer(armies(from),armies(to))<.20)break;render();await wait(130);
+  }sfx.hit();
+}
+async function aiFortify(p,K,L){
+  const maxMoves=Math.max(1,Math.round(2*K.fort));let moves=0;
+  while(moves<maxMoves){
+    const own=ownedBy(p);const sources=own.filter(id=>armies(id)>1&&!S.srcUsed.has(id)&&!S.gotArmies.has(id)&&!enemiesOf(id,p).length&&ADJ[id].some(x=>isMine(x,p)));
+    if(!sources.length)break;let best=null,bs=-1e9;
+    sources.forEach(src=>ADJ[src].filter(x=>isMine(x,p)).forEach(dst=>{let s=threat(dst,p)-armies(dst)+objWeightTerr(p,dst)*1.2*K.objW;if(!enemiesOf(dst,p).length)s-=4;s*=L.fortifyQ;s+=(Math.random()-.5)*L.noise*3;if(s>bs){bs=s;best={src,dst};}}));
+    if(!best||bs<.3)break;const n=armies(best.src)-1;S.terr[best.src].a-=n;S.terr[best.dst].a+=n;
+    S.srcUsed.add(best.src);S.gotArmies.add(best.dst);log(p,`moveu <em><LaTex>id_47</LaTex>{byId[best.dst].n}.`);render();await wait(190);moves++;
+  }
+}
+async function aiTurn(p){
+  const K=PERSONAS[p.persona],L=LEVELS[p.level],epoch=S.epoch;const stale=()=>S.epoch!==epoch;
+  await wait(420);if(stale())return;aiTrade(p,L);render();await wait(230);if(stale())return;
+  await aiPlace(p,K,L);if(stale())return;if(S.gameOver)return;
+  S.phase='ataque';render();await wait(240);if(stale())return;await aiAttack(p,K,L);if(stale())return;
+  if(S.gameOver)return;S.phase='remanejar';S.srcUsed=new Set();S.gotArmies=new Set();render();await wait(220);if(stale())return;
+  await aiFortify(p,K,L);if(stale())return;await wait(240);
+}
+function endGame(win,why){
+  S.gameOver=true;S.busy=false;S.sel=null;$('#mBattle').classList.remove('on');$('#mMove').classList.remove('on');sfx.win();
+  $('#vTitle').textContent=win===me()?'Vitória':'Derrota';
+  $('#vBody').innerHTML=`<div class="crown"><LaTex>id_48</LaTex>{win.color.hex}"><LaTex>id_49</LaTex>{why} · rodada <LaTex>id_50</LaTex>('#mVictory').classList.add('on');logSys(`<em><LaTex>id_51</LaTex>{why}`);render();
+}
+
+let pickedColor='azul';
+
+/* ✅ CORREÇÃO CRÍTICA: buildSetup com addEventListener */
+function buildSetup(){
+  const box=$('#setColors');box.innerHTML='';
+  COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='sw'+(c.id===pickedColor?' on':'');
+    d.style.background=c.hex;
+    d.title=c.n;
+    d.setAttribute('role','button');
+    d.setAttribute('tabindex','0');
+    d.setAttribute('aria-label','Cor '+c.n);
+    
+    // ✅ Handler unificado para mouse e touch
+    const handler=(e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      pickedColor=c.id;
+      sfx.click();
+      buildSetup();
+    };
+    
+    d.addEventListener('click',handler);
+    d.addEventListener('touchend',handler,{passive:false});
+    d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handler(e);}});
+    
+    box.appendChild(d);
+  });
+}
+
+function updateSetupCount(){const n=+$('#setPlayers').value;$('#setupCount').textContent=`Você + ${n-1} adversário<LaTex>id_52</LaTex>('#setPlayers').addEventListener('change',updateSetupCount);
+
+function openSetup(){buildSetup();updateSetupCount();<LaTex>id_53</LaTex>('#btnStart').addEventListener('click',()=>{
+  try{
+    // ✅ Desbloqueia áudio no iOS
+    actx();
+    <LaTex>id_54</LaTex>('#setPlayers').value,
+      colorId:pickedColor,
+      name:<LaTex>id_55</LaTex>('#setObjMode').value,
+      powers:<LaTex>id_56</LaTex>('#setMin3').checked
+    });
+  }catch(e){
+    console.error('Erro ao iniciar:',e);
+    alert('Erro ao iniciar jogo: '+e.message+'\n\nCor selecionada: '+pickedColor);
+  }
+});
+
+<LaTex>id_57</LaTex>('#rulesBody').innerHTML='<h4 style="color:var(--brass)">Regras</h4><p>Atacante: até 3 dados. Defensor: até 2 dados. Empate favorece defesa. Conquiste 1+ território/turno para receber carta.</p>';$('
