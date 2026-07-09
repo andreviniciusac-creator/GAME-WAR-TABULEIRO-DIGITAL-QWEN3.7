@@ -1,102 +1,75 @@
-# GAME-WAR-TABULEIRO-DIGITAL-QWEN3.7
-SIMULACAO DO JOGO DE TABULEIRO WAR FEITO COM IA
-# 🎲 WAR — Estratégia e Conquista
+# WAR — Estratégia e Conquista
 
-Um jogo de tabuleiro digital completo baseado no clássico WAR, implementado em HTML5, CSS3 e JavaScript puro, com mapa mundi real baseado em coordenadas geográficas.
+Simulação digital do clássico jogo de tabuleiro WAR, em **HTML5 + CSS3 + JavaScript puro** (sem dependências de build).
 
-![WAR](https://img.shields.io/badge/Status-Completo-brightgreen) ![Versão](https://img.shields.io/badge/Versão-1.0-blue) ![Licença](https://img.shields.io/badge/Licença-MIT-green)
+Um único arquivo responsivo serve **desktop, tablet e iPad/iPhone**:
 
-## 📋 Índice
+```text
+index.html
+```
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Funcionalidades](#-funcionalidades)
-- [Tecnologias](#-tecnologias)
-- [Como Executar](#-como-executar)
-- [Regras do Jogo](#-regras-do-jogo)
-- [Arquitetura](#-arquitetura)
-- [Correções Implementadas](#-correções-implementadas)
-- [Mapa Mundi Real](#-mapa-mundi-real)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licença)
+## Como executar
 
-## 🎯 Sobre o Projeto
+### Recomendado (servidor local)
 
-WAR é uma implementação digital completa do clássico jogo de tabuleiro de conquista territorial. O jogo features:
+Abrir o arquivo via `file://` funciona em muitos casos, mas o mapa geográfico (GeoJSON) e o áudio no iOS ficam mais confiáveis com HTTP:
 
-- **42 territórios** distribuídos em 6 continentes
-- **Mapa mundi real** com fronteiras geográficas verdadeiras
-- **Sistema de combate** seguindo as regras oficiais
-- **IA com personalidades** distintas (pacífico, agressivo, estrategista, etc.)
-- **Objetivos secretos** e sistema de cartas
-- **Cartas de estratégia** com poderes especiais
-- **Interface responsiva** que funciona em desktop e mobile
-
-## ✨ Funcionalidades
-
-### 🗺️ Mapa Interativo
-- Zoom e pan com gestos de mouse/touch
-- Fronteiras reais de países agrupadas em territórios
-- Visualização de rotas de fronteira (terrestres e marítimas)
-- Tooltips informativos com dados do território
-- Destaque visual de territórios selecionáveis
-
-### ⚔️ Sistema de Combate
-- Rolagem de dados animada
-- Cálculo de probabilidades em tempo real
-- Atacante: até 3 dados (exércitos - 1)
-- Defensor: até 2 dados (regra oficial WAR)
-- Empate favorece a defesa
-- Ataque total (blitz) automatizado
-
-### 🤖 Inteligência Artificial
-- 6 personalidades distintas:
-  - **Pacífico**: Evita combate, fortifica fronteiras
-  - **Agressivo & Estrategista**: Ataca cedo, persegue objetivos
-  - **Mediano**: Equilibra expansão e defesa
-  - **Oportunista**: Foca no vizinho mais fraco
-  - **Defensivo**: Muralhas primeiro, conquista depois
-  - **Estrategista**: Movimentos focados no objetivo
-
-- 3 níveis de competência (Recruta, Oficial, Marechal)
-- Personalidade e competência são independentes e secretas
-
-### 🎴 Sistema de Cartas
-- **Cartas de território**: 42 cartas + 2 coringas
-- **Trocas estratégicas**: Valores crescentes (4, 6, 8, 10, 12, 15, +5)
-- **Cartas de estratégia**: 8 poderes especiais
-  - Artilharia Pesada (4 dados, usa 3 melhores)
-  - Muralha de Ferro (+1 defesa)
-  - Ponte Aérea (movimento não-adjacente)
-  - Espionagem (revela objetivos)
-  - Sabotagem (remove exércitos)
-  - Mobilização Geral (+4 exércitos)
-  - Trégua (imunidade temporária)
-  - Blitzkrieg (+1 exército em conquistas)
-
-### 🎯 Objetivos
-- 8 objetivos territoriais clássicos
-- 6 objetivos de destruição (eliminar cor específica)
-- Modo conquista total (42 territórios)
-- Modo objetivo secreto (padrão)
-
-## 🛠️ Tecnologias
-
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilização com variáveis CSS, grid, flexbox
-- **JavaScript (ES6+)**: Lógica do jogo, sem dependências externas
-- **SVG**: Renderização do mapa e animações
-- **Web Audio API**: Efeitos sonoros procedurais
-- **GeoJSON**: Dados geográficos reais (Natural Earth)
-
-## 🚀 Como Executar
-
-### Método 1: Abertura Direta
 ```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/war-game.git
+# Python 3
+python -m http.server 8000
 
-# Navegue até o diretório
-cd war-game
+# ou Node
+npx serve
+```
 
-# Abra o arquivo index.html no navegador
-# (duplo clique ou arraste para o navegador)
+Depois abra no navegador:
+
+- Desktop: http://localhost:8000/
+- iPad (mesma rede Wi‑Fi): http://SEU-IP-LOCAL:8000/
+
+### Abertura direta
+
+Dê um duplo clique em `index.html` ou arraste-o para o Safari/Chrome.
+
+> **iPad:** use a extensão `.html` e, de preferência, o servidor local. O arquivo antigo `War-mobile` (sem extensão e com JS corrompido) **não deve ser usado**.
+
+## Funcionalidades
+
+- 42 territórios · 6 continentes · combate com dados oficiais (até 3×2)
+- IA com personalidades e níveis de competência
+- Objetivos secretos ou conquista total
+- Cartas de território e de estratégia
+- Mapa mundi via GeoJSON (Natural Earth), com **fallback offline estável**
+- Zoom/pan com mouse, roda e **pinça no touch**
+- Layout com abas no tablet/mobile (Exércitos · Mapa · Comando)
+
+## Arquitetura
+
+| Arquivo | Status |
+|---------|--------|
+| `index.html` | **Principal** — UI + CSS + lógica unificados e responsivos |
+| `CODE_WAR` | Legado desktop (referência) |
+| `War-mobile` | Legado quebrado (não usar) |
+| `COM_PYTHON` / `DOCKER` | Notas de execução (Docker incompleto no repo) |
+
+## Correções na versão unificada
+
+- Removidos scripts CDN não usados (`d3`, `topojson`)
+- `buildMap()` assíncrono com `await` antes do turno
+- Mapa offline com posições fixas (sem `Math.random`)
+- Timeout no `fetch` do GeoJSON
+- CSS do iPad: coluna única + abas (sem grid de 3 colunas com laterais ocultas)
+- Meta viewport, safe-area, alvos de toque ≥ 44px, inputs 16px (evita zoom no iOS)
+- Pinça, double-tap zoom, desbloqueio de `AudioContext` no primeiro toque
+- Seleção de cor no setup acessível (`role=button`, teclado)
+
+## Regras (resumo)
+
+- Atacante: até 3 dados (exércitos − 1)
+- Defensor: até 2 dados
+- Empate favorece a defesa
+- Conquistar ≥ 1 território no turno concede carta
+
+## Licença
+
+MIT (conforme badges do projeto original).
