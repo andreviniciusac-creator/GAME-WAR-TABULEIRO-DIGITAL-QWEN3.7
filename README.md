@@ -1,6 +1,6 @@
 # WAR — Estratégia e Conquista
 
-Simulação digital do clássico jogo de tabuleiro WAR, em **HTML5 + CSS3 + JavaScript puro** (sem dependências de build).
+Simulação digital do clássico jogo de tabuleiro **WAR** (Grow), em **HTML5 + CSS3 + JavaScript puro** (sem dependências de build).
 
 Um único arquivo responsivo serve **desktop, tablet e iPad/iPhone**:
 
@@ -35,13 +35,29 @@ Dê um duplo clique em `index.html` ou arraste-o para o Safari/Chrome.
 
 ## Funcionalidades
 
-- 42 territórios · 6 continentes · combate com dados oficiais (até 3×2)
+- 42 territórios · 6 continentes · combate com dados oficiais
+- **Defesa interativa**: quando você é atacado, o painel abre e **você rola os dados**
+- Painel de combate com **atacante, país de origem, país sob ataque e defensor**
 - IA com personalidades e níveis de competência
 - Objetivos secretos ou conquista total
-- Cartas de território e de estratégia
+- Cartas de território e de **estratégia / guerra moderna**
 - Mapa mundi via GeoJSON (Natural Earth), com **fallback offline estável**
 - Zoom/pan com mouse, roda e **pinça no touch**
 - Layout com abas no tablet/mobile (Exércitos · Mapa · Comando)
+
+## Guerra moderna (cartas)
+
+Conquiste **2 ou mais** territórios no mesmo turno para receber uma carta de estratégia (máx. 3 na mão):
+
+| Carta | Efeito |
+|-------|--------|
+| Ataque Aéreo | Bombardeia qualquer território inimigo (−1–2, sem conquistar) |
+| Frota Naval | +1 no maior dado de ataque em rota marítima |
+| Emboscada Naval | +1 dado de ataque (até 4) em rota marítima |
+| Enxame de Drones | −1 em inimigo adjacente + reconhecimento |
+| Domo de Ferro | Anula a 1ª perda na próxima defesa |
+| Ponte Aérea | Remaneja até 5 exércitos entre territórios seus (mesmo não adjacentes) |
+| Artilharia / Muralha / Blitz / Sabotagem / Espionagem / Trégua / Mobilização | Buffs e utilidades clássicos |
 
 ## Arquitetura
 
@@ -52,23 +68,20 @@ Dê um duplo clique em `index.html` ou arraste-o para o Safari/Chrome.
 | `War-mobile` | Legado quebrado (não usar) |
 | `COM_PYTHON` / `DOCKER` | Notas de execução (Docker incompleto no repo) |
 
-## Correções na versão unificada
-
-- Removidos scripts CDN não usados (`d3`, `topojson`)
-- `buildMap()` assíncrono com `await` antes do turno
-- Mapa offline com posições fixas (sem `Math.random`)
-- Timeout no `fetch` do GeoJSON
-- CSS do iPad: coluna única + abas (sem grid de 3 colunas com laterais ocultas)
-- Meta viewport, safe-area, alvos de toque ≥ 44px, inputs 16px (evita zoom no iOS)
-- Pinça, double-tap zoom, desbloqueio de `AudioContext` no primeiro toque
-- Seleção de cor no setup acessível (`role=button`, teclado)
-
 ## Regras (resumo)
 
-- Atacante: até 3 dados (exércitos − 1)
-- Defensor: até 2 dados
-- Empate favorece a defesa
-- Conquistar ≥ 1 território no turno concede carta
+- Atacante: até **3 dados** (exércitos − 1)
+- Defensor: até **3 dados** com a opção *Regras War* (Grow); ou 2 no estilo Risk
+- **Empate favorece a defesa**
+- Conquistar ≥ 1 território no turno concede carta de território
+- Conquistar ≥ 2 no mesmo turno concede carta de estratégia
+
+## Opções na ordem de batalha
+
+- Cartas de estratégia e guerra moderna
+- Mínimo de 3 exércitos por rodada
+- Regras War (defesa até 3 dados)
+- Eu rolo os dados quando sou atacado
 
 ## Licença
 

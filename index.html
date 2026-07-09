@@ -12,13 +12,14 @@
 <title>WAR — Estratégia e Conquista</title>
 <style>
 :root{
-  --abyss:#05090f;--ink:#0b1322;--chart:#132039;--panel:rgba(12,20,34,.82);
-  --line:rgba(200,155,60,.18);--line2:rgba(148,170,200,.14);--brass:#c89b3c;
-  --brass-dim:#8a6c2c;--verdigris:#4e9c8b;--rust:#b5442e;--bone:#e6e2d3;
-  --muted:#8fa0b8;--shadow:0 18px 50px -20px rgba(0,0,0,.9);
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
-  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,Roboto,"Segoe UI",Arial,sans-serif;
-  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --abyss:#0a0e12;--ink:#121820;--chart:#1a2430;--panel:rgba(18,24,32,.92);
+  --line:rgba(196,168,96,.22);--line2:rgba(120,140,160,.16);--brass:#c4a860;
+  --brass-dim:#8a7540;--verdigris:#3d9a7a;--rust:#c44a32;--bone:#e8e4d8;
+  --muted:#8a96a8;--shadow:0 12px 40px -16px rgba(0,0,0,.75);
+  --alert:#e85d3a;--sea:#3a7a9a;--radar:#4a9a6a;
+  --serif:Georgia,"Times New Roman",Times,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --sat:env(safe-area-inset-top,0px);
   --sab:env(safe-area-inset-bottom,0px);
   --sal:env(safe-area-inset-left,0px);
@@ -41,16 +42,16 @@ input,select,textarea{-webkit-user-select:text;user-select:text;font-size:16px;m
 }
 .topbar{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(19,32,57,.95),rgba(5,9,15,.85));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);flex-wrap:wrap}
 .brand{display:flex;align-items:baseline;gap:9px;flex:0 0 auto}
-.brand b{font-family:var(--serif);font-size:23px;letter-spacing:.34em;font-weight:600;color:var(--brass);text-shadow:0 0 22px rgba(200,155,60,.35);padding-left:2px}
-.brand span{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.brand b{font-family:var(--serif);font-size:22px;letter-spacing:.12em;font-weight:700;color:var(--brass);padding-left:2px}
+.brand span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .turnbox{display:flex;align-items:center;gap:9px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.28)}
 .turnbox .dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 14px currentColor}
 .turnbox b{font-size:13px;letter-spacing:.04em}
 .turnbox small{font-size:11px;color:var(--muted);font-family:var(--mono)}
 .phases{display:flex;align-items:center;gap:0;margin-left:auto}
-.phase{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:6px 13px;border:1px solid transparent;position:relative;white-space:nowrap}
+.phase{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:6px 12px;border:1px solid transparent;position:relative;white-space:nowrap;border-radius:4px}
 .phase+.phase::before{content:"";position:absolute;left:-1px;top:50%;width:6px;height:1px;background:var(--line2)}
-.phase.active{color:var(--abyss);background:var(--brass);border-radius:4px;font-weight:700;box-shadow:0 0 18px -4px var(--brass)}
+.phase.active{color:#1a1408;background:var(--brass);font-weight:700}
 .tools{display:flex;gap:6px;flex:0 0 auto}
 .btn{background:rgba(255,255,255,.03);border:1px solid var(--line2);color:var(--bone);padding:8px 12px;border-radius:7px;font-size:12.5px;letter-spacing:.02em;transition:.16s border-color,.16s background,.16s transform;min-height:44px}
 .btn:hover{background:rgba(200,155,60,.1);border-color:var(--line)}
@@ -69,7 +70,7 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
 .stage{display:grid;grid-template-columns:262px minmax(0,1fr) 306px;gap:10px;padding:10px;min-height:0;overflow:hidden}
 .col{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;padding-right:2px;-webkit-overflow-scrolling:touch}
 .panel{background:var(--panel);border:1px solid var(--line2);border-radius:12px;backdrop-filter:blur(9px);box-shadow:var(--shadow);overflow:hidden;flex:0 0 auto}
-.panel>h3{margin:0;padding:9px 12px;font-family:var(--serif);font-size:11.5px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--brass);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel>h3{margin:0;padding:10px 12px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brass);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
 .panel>h3 .tag{font-family:var(--mono);letter-spacing:0;font-size:10.5px;color:var(--muted);text-transform:none}
 .panel .body{padding:10px 12px}
 .panel.grow{flex:1 1 auto;display:flex;flex-direction:column;min-height:150px}
@@ -90,7 +91,8 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
 .crow .bonus{font-family:var(--mono);font-size:11px;color:var(--brass)}
 .crow .own{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .crow.complete .nm{color:#fff;font-weight:600}
-.mapwrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:radial-gradient(120% 100% at 50% 0%,#16273f 0%,#0a1120 48%,#04070d 100%);box-shadow:var(--shadow);min-height:0;touch-action:none;-webkit-touch-callout:none}
+.mapwrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line2);background:linear-gradient(165deg,#152030 0%,#0c121c 55%,#080c12 100%);box-shadow:var(--shadow);min-height:0;touch-action:none;-webkit-touch-callout:none}
+.mapwrap::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:1}
 #map{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #map.dragging{cursor:grabbing}
 .zoomctl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:5px}
@@ -102,8 +104,10 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
 .terr{cursor:pointer}
 .terr .tp{filter:saturate(1.05)}
 .terr:hover .tp{stroke:#fff;stroke-width:2.4}
-.terr.sel .tp{stroke:var(--brass);stroke-width:3.4;filter:drop-shadow(0 0 12px rgba(200,155,60,.85))}
-.terr.tgt .tp{stroke:var(--rust);stroke-width:3;filter:drop-shadow(0 0 10px rgba(181,68,46,.8))}
+.terr.sel .tp{stroke:var(--brass);stroke-width:3.2;filter:drop-shadow(0 0 6px rgba(196,168,96,.45))}
+.terr.tgt .tp{stroke:var(--alert);stroke-width:3;filter:drop-shadow(0 0 5px rgba(232,93,58,.4))}
+.terr.under-fire .tp{stroke:var(--alert);stroke-width:3.2;animation:underFire 1s ease-in-out infinite}
+@keyframes underFire{0%,100%{stroke-opacity:1;filter:drop-shadow(0 0 4px rgba(232,93,58,.5))}50%{stroke-opacity:.55;filter:drop-shadow(0 0 10px rgba(232,93,58,.8))}}
 .terr.dim{opacity:.34}
 .terr.pulse .tp{animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{stroke-opacity:.55}50%{stroke-opacity:1}}
@@ -144,28 +148,53 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
 .actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 .backdrop{position:fixed;inset:0;background:rgba(3,6,12,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;padding-top:calc(16px + var(--sat));padding-bottom:calc(16px + var(--sab));overflow-y:auto;-webkit-overflow-scrolling:touch}
 .backdrop.on{display:flex}
-.modal{width:min(680px,100%);max-height:85vh;max-height:85dvh;overflow:auto;background:linear-gradient(180deg,#101b2f,#080d18);border:1px solid var(--line);border-radius:16px;box-shadow:0 40px 90px -30px #000;animation:rise .28s cubic-bezier(.2,.9,.2,1);-webkit-overflow-scrolling:touch}
+.modal{width:min(680px,100%);max-height:85vh;max-height:85dvh;overflow:auto;background:#141c26;border:1px solid var(--line2);border-radius:12px;box-shadow:0 24px 60px -20px #000,inset 0 1px 0 rgba(255,255,255,.04);animation:rise .22s ease-out;-webkit-overflow-scrolling:touch}
 .modal.wide{width:min(880px,100%)}
 .modal.slim{width:min(460px,100%)}
-@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.98)}}
-.modal header{padding:16px 20px 12px;border-bottom:1px solid var(--line)}
-.modal header h2{margin:0;font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
-.modal header p{margin:5px 0 0;font-size:12.5px;color:var(--muted);line-height:1.55}
-.modal .content{padding:16px 20px}
-.modal footer{padding:12px 20px 16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.modal.battle-modal{width:min(720px,100%);border-color:rgba(196,168,96,.28)}
+.modal.battle-modal.defend-mode{border-color:rgba(232,93,58,.45);box-shadow:0 24px 60px -20px #000,0 0 0 1px rgba(232,93,58,.15)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.modal header{padding:14px 18px 12px;border-bottom:1px solid var(--line2)}
+.modal header h2{margin:0;font-family:var(--sans);font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brass)}
+.modal.defend-mode header h2{color:var(--alert)}
+.modal header p{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.5}
+.modal .content{padding:14px 18px}
+.modal footer{padding:12px 18px 14px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line2);background:rgba(0,0,0,.2)}
+.battle-brief{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-bottom:14px}
+.bb-card{padding:12px 14px;border-radius:10px;border:1px solid var(--line2);background:rgba(0,0,0,.28);position:relative}
+.bb-card.att{border-left:3px solid var(--rust)}
+.bb-card.def{border-left:3px solid var(--verdigris)}
+.bb-card .bb-role{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bb-card .bb-player{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:4px}
+.bb-card .bb-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;box-shadow:0 0 0 2px rgba(0,0,0,.4)}
+.bb-card .bb-terr{font-family:var(--serif);font-size:17px;line-height:1.2;margin:2px 0}
+.bb-card .bb-meta{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.bb-card .bb-meta b{color:var(--bone);font-size:15px}
+.bb-vs{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:48px}
+.bb-vs .arrow{font-size:22px;color:var(--alert);line-height:1;font-weight:700}
+.bb-vs .lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.bb-route{text-align:center;font-size:12px;color:var(--muted);margin:-4px 0 12px;padding:6px 10px;background:rgba(0,0,0,.25);border-radius:6px;border:1px dashed var(--line2)}
+.bb-route b{color:var(--bone)}
+.bb-route .sea-tag{color:var(--sea);font-weight:700}
+.bb-alert{display:none;margin-bottom:12px;padding:10px 12px;border-radius:8px;background:rgba(232,93,58,.12);border:1px solid rgba(232,93,58,.35);color:#f0b8a8;font-size:13px;line-height:1.45}
+.defend-mode .bb-alert{display:block}
+.bb-alert strong{color:#fff}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field>span{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .swatches{display:flex;gap:8px;flex-wrap:wrap}
 .sw{width:48px;height:48px;border-radius:10px;border:3px solid transparent;cursor:pointer;transition:.15s;touch-action:manipulation;-webkit-tap-highlight-color:rgba(200,155,60,.3)}
 .sw.on{border-color:var(--brass);transform:scale(1.08);box-shadow:0 0 16px -3px var(--brass)}
-.duel{display:grid;grid-template-columns:1fr 64px 1fr;gap:10px;align-items:center}
-.side{text-align:center;padding:12px;border-radius:12px;border:1px solid var(--line2);background:rgba(0,0,0,.25)}
-.side .who{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.side .terr-nm{font-family:var(--serif);font-size:16.5px;letter-spacing:.09em;margin:3px 0 2px}
-.side .armies{font-family:var(--mono);font-size:13px;color:var(--muted)}
-.side .armies b{color:var(--bone);font-size:19px}
-.vs{text-align:center;font-family:var(--serif);letter-spacing:.16em;color:var(--brass);font-size:14px}
+.duel{display:grid;grid-template-columns:1fr 56px 1fr;gap:10px;align-items:center}
+.side{text-align:center;padding:12px;border-radius:10px;border:1px solid var(--line2);background:rgba(0,0,0,.3)}
+.side.side-att{border-top:2px solid var(--rust)}
+.side.side-def{border-top:2px solid #d4a010}
+.side .who{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.side .terr-nm{font-family:var(--serif);font-size:16px;margin:4px 0 2px}
+.side .armies{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.side .armies b{color:var(--bone);font-size:18px}
+.side .player-line{font-size:12px;margin-top:2px;opacity:.9}
+.vs{text-align:center;font-family:var(--sans);letter-spacing:.08em;color:var(--brass);font-size:13px;font-weight:700}
 .odds{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;margin-top:9px}
 .odds b{color:var(--brass);font-size:15px}
 .oddsbar{height:5px;border-radius:3px;background:rgba(181,68,46,.4);overflow:hidden;margin-top:6px}
@@ -213,7 +242,7 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
   .topbar{gap:8px;padding:8px 10px}
   .phases{order:5;width:100%;justify-content:space-between}
   .tools{margin-left:auto}
-  .brand b{font-size:18px;letter-spacing:.22em}
+  .brand b{font-size:18px;letter-spacing:.08em}
   .bottombar{flex-wrap:wrap;gap:8px}
   #hint{width:100%;font-size:12px}
   .actions{width:100%;justify-content:stretch}
@@ -352,23 +381,28 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
           </select>
         </div>
         <div class="field"><span>Regras opcionais</span>
-          <label class="chk"><input type="checkbox" id="setPowers" checked> Cartas de estratégia</label>
+          <label class="chk"><input type="checkbox" id="setPowers" checked> Cartas de estratégia e guerra moderna</label>
           <label class="chk"><input type="checkbox" id="setMin3" checked> Mínimo de 3 exércitos por rodada</label>
+          <label class="chk"><input type="checkbox" id="setWarDice" checked> Regras War (defesa até 3 dados)</label>
+          <label class="chk"><input type="checkbox" id="setDefRoll" checked> Eu rolo os dados quando sou atacado</label>
         </div>
       </div>
     </div>
   </div>
   <footer><button class="btn primary" id="btnStart">Iniciar a guerra</button></footer>
 </div></div>
-<div class="backdrop" id="mBattle"><div class="modal">
-  <header><h2>Combate</h2><p id="battleSub"></p></header>
+<div class="backdrop" id="mBattle"><div class="modal battle-modal" id="battleModal">
+  <header><h2 id="battleTitle">Combate</h2><p id="battleSub"></p></header>
   <div class="content">
+    <div class="bb-alert" id="battleAlert"><strong>Seu território está sob ataque!</strong> Role os dados amarelos para defender.</div>
+    <div class="battle-brief" id="battleBrief"></div>
+    <div class="bb-route" id="battleRoute"></div>
     <div class="duel">
-      <div class="side" id="sideA"></div>
-      <div class="vs">×</div>
-      <div class="side" id="sideD"></div>
+      <div class="side side-att" id="sideA"></div>
+      <div class="vs">VS</div>
+      <div class="side side-def" id="sideD"></div>
     </div>
-    <div class="odds">Chance de tomar o território: <b id="oddsN">—</b><div class="oddsbar"><i id="oddsBar"></i></div></div>
+    <div class="odds">Chance do atacante conquistar: <b id="oddsN">—</b><div class="oddsbar"><i id="oddsBar"></i></div></div>
     <div class="blog" id="blog"></div>
   </div>
   <footer>
@@ -554,14 +588,19 @@ function destroyObjs(colorIds){
   });
 }
 const POWERS = [
-  {id:'artilharia', ico:'🎯', n:'Artilharia Pesada', d:'Rola 4 dados e usa os 3 melhores.', phase:'ataque'},
-  {id:'muralha',    ico:'🛡️', n:'Muralha de Ferro',  d:'+1 no maior dado de defesa.', phase:'any'},
-  {id:'ponte',      ico:'✈️', n:'Ponte Aérea',       d:'Mova até 5 exércitos entre territórios não adjacentes.', phase:'remanejar'},
-  {id:'espionagem', ico:'🔍', n:'Espionagem',        d:'Revela o objetivo de um oponente.', phase:'any'},
-  {id:'sabotagem',  ico:'💣', n:'Sabotagem',         d:'Elimina até 2 exércitos inimigos.', phase:'any'},
-  {id:'mobilizacao',ico:'⚑', n:'Mobilização Geral',  d:'+4 exércitos para posicionar.', phase:'reforco'},
-  {id:'tregua',     ico:'🕊️', n:'Trégua',            d:'Um oponente não pode atacá-lo no próximo turno.', phase:'any'},
-  {id:'blitz',      ico:'⚡', n:'Blitzkrieg',        d:'Território conquistado recebe +1 exército.', phase:'ataque'}
+  {id:'artilharia',   ico:'▣', n:'Artilharia Pesada',  d:'No próximo combate de ataque, rola 4 dados e usa os 3 melhores.', phase:'ataque'},
+  {id:'muralha',      ico:'◈', n:'Muralha de Ferro',   d:'+1 no maior dado de defesa até o fim do turno.', phase:'any'},
+  {id:'ponte',        ico:'✈', n:'Ponte Aérea',        d:'Na fase de remanejamento, mova até 5 exércitos entre quaisquer territórios seus.', phase:'remanejar'},
+  {id:'espionagem',   ico:'◎', n:'Espionagem',         d:'Revela o objetivo secreto de um oponente.', phase:'any'},
+  {id:'sabotagem',    ico:'✦', n:'Sabotagem',          d:'Elimina até 2 exércitos de um território inimigo (mín. 1 permanece).', phase:'ataque'},
+  {id:'mobilizacao',  ico:'⚑', n:'Mobilização Geral',  d:'+4 exércitos para posicionar neste turno.', phase:'reforco'},
+  {id:'tregua',       ico:'○', n:'Trégua Diplomática', d:'Escolha um oponente: ele não pode atacá-lo no próximo turno dele.', phase:'any'},
+  {id:'blitz',        ico:'⚡', n:'Blitzkrieg',         d:'O próximo território conquistado recebe +1 exército de ocupação.', phase:'ataque'},
+  {id:'ataque_aereo', ico:'▲', n:'Ataque Aéreo',       d:'Bombardeia qualquer território inimigo: remove 1–2 exércitos sem conquistar.', phase:'ataque'},
+  {id:'frota_naval',  ico:'⚓', n:'Frota Naval',        d:'No próximo ataque por rota marítima, +1 no maior dado de ataque.', phase:'ataque'},
+  {id:'drone',        ico:'◇', n:'Enxame de Drones',   d:'Remove 1 exército de um inimigo adjacente e revela a força da região.', phase:'ataque'},
+  {id:'domo',         ico:'⬡', n:'Domo de Ferro',      d:'Na próxima defesa, anula a primeira perda de exército do defensor.', phase:'any'},
+  {id:'submarino',    ico:'▼', n:'Emboscada Naval',    d:'Próximo ataque marítimo: +1 dado de ataque (até 4, usa os 3 melhores).', phase:'ataque'}
 ];
 const $  = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
@@ -622,14 +661,16 @@ const sfx={
   turn: ()=>tone(440,.1,'sine',.035)
 };
 const S = {
-  settings:{speed:'normal', sound:true, links:true, names:true, odds:true, powers:true, min3:true, objMode:'secreto'},
+  settings:{speed:'normal', sound:true, links:true, names:true, odds:true, powers:true, min3:true, warDice:true, defRoll:true, objMode:'secreto'},
   players:[], order:[], turn:0, round:1, phase:'reforco',
   terr:{}, deck:[], discard:[], powerDeck:[],
   epoch:0, reinf:0, placed:{}, conquered:0, mustTrade:false,
   srcUsed:new Set(), gotArmies:new Set(),
-  sel:null, gameOver:false, busy:false,
+  sel:null, gameOver:false, busy:false, pickMode:null,
   tradeCount:0, log:[], stats:[], geoData:null
 };
+function maxDefDice(){ return S.settings.warDice ? 3 : 2; }
+function isSeaLink(a,b){ return SEA.has(a+'|'+b) || SEA.has(b+'|'+a); }
 const cur = ()=>S.players[S.order[S.turn]];
 const me  = ()=>S.players.find(p=>!p.isAI);
 const owner = id=>S.players[S.terr[id].o];
@@ -716,9 +757,10 @@ function pConquer(A,D){
   if(D<=0) return 1;
   if(A<=1) return 0;
   if(A>60) A=60; if(D>60) D=60;
-  const key=A+'x'+D;
+  const md=maxDefDice();
+  const key=A+'x'+D+'d'+md;
   if(_win.has(key)) return _win.get(key);
-  const a=Math.min(3,A-1), d=Math.min(2,D), cmp=Math.min(a,d);
+  const a=Math.min(3,A-1), d=Math.min(md,D), cmp=Math.min(a,d);
   const pr=roundProbs(a,d);
   let p=0;
   for(let i=0;i<=cmp;i++) if(pr[i]>0) p += pr[i]*pConquer(A-i, D-(cmp-i));
@@ -726,19 +768,23 @@ function pConquer(A,D){
 }
 function rollDice(n){ return Array.from({length:n},()=>1+rnd(6)); }
 function resolveRound(A,D,mods={}){
-  const an = Math.min(mods.extraDie?4:3, A-1);
-  const dn = Math.min(2, D); // CORREÇÃO: Defensor usa máximo 2 dados
+  const maxA = (mods.extraDie||mods.submarino) ? 4 : 3;
+  const an = Math.min(maxA, A-1);
+  const dn = Math.min(maxDefDice(), D);
   const aRaw = rollDice(an).sort((x,y)=>y-x);
-  const aKept = aRaw.slice(0,3);
+  let aKept = aRaw.slice(0,3);
   const dRaw = rollDice(dn).sort((x,y)=>y-x);
   const dEff = [...dRaw];
   if(mods.wall && dEff.length) dEff[0] = Math.min(7, dEff[0]+1);
+  if(mods.naval && aKept.length) aKept[0] = Math.min(7, aKept[0]+1);
   const cmp = Math.min(aKept.length, dEff.length);
   let aLoss=0, dLoss=0; const pairs=[];
   for(let i=0;i<cmp;i++){
     if(aKept[i] > dEff[i]){ dLoss++; pairs.push('a'); } else { aLoss++; pairs.push('d'); }
   }
-  return {aRaw, aKept, dRaw, dEff, aLoss, dLoss, pairs, cmp};
+  let domeSave=false;
+  if(mods.dome && dLoss>0){ dLoss--; domeSave=true; }
+  return {aRaw, aKept, dRaw, dEff, aLoss, dLoss, pairs, cmp, domeSave};
 }
 function buildDeck(){
   const d = TERRS.map(t=>({t:t.id, s:t.s}));
@@ -788,7 +834,8 @@ function assignObjectives(){
 async function newGame(cfg){
   S.epoch=(S.epoch||0)+1;
   const np = cfg.players;
-  Object.assign(S.settings,{powers:cfg.powers, min3:cfg.min3, objMode:cfg.objMode});
+  Object.assign(S.settings,{powers:cfg.powers, min3:cfg.min3, warDice:cfg.warDice, defRoll:cfg.defRoll, objMode:cfg.objMode});
+  _win.clear();
   const otherColors = shuffle(COLORS.filter(c=>c.id!==cfg.colorId));
   const names = shuffle([...AI_NAMES]);
   const personas = personaPool(np-1);
@@ -1234,10 +1281,16 @@ function render(){
     }
     const tn = g.querySelector('.tn');
     if (tn) tn.style.display = S.settings.names ? '' : 'none';
-    g.classList.remove('sel','tgt','dim','pulse');
+    g.classList.remove('sel','tgt','dim','pulse','under-fire');
   });
+  if(B && B.to){
+    const gf=gTerr.querySelector(`[data-id="${B.from}"]`);
+    const gt=gTerr.querySelector(`[data-id="${B.to}"]`);
+    if(gf) gf.classList.add('sel');
+    if(gt) gt.classList.add('under-fire','tgt');
+  }
   if(gLinks) gLinks.style.display = S.settings.links ? '' : 'none';
-  if(!S.gameOver && p===me() && !S.busy){
+  if(!S.gameOver && p===me() && !S.busy && !B){
     if(S.phase==='reforco'){
       ownedBy(p).forEach(id=>{
         const g = gTerr.querySelector(`[data-id="${id}"]`);
@@ -1389,7 +1442,21 @@ function renderActions(){
   }
 }
 function onTerrClick(id){
-  if(S.gameOver||S.busy) return;
+  if(S.gameOver) return;
+  // Modo de seleção para cartas de estratégia
+  if(S.pickMode && S.pickMode.filter){
+    if(S.pickMode.filter(id)){
+      const res=S.pickMode.resolve;
+      S.pickMode=null;
+      sfx.click(); flash(id);
+      if(res) res(id);
+    } else {
+      setHint('Território inválido para esta ação. '+ (S.pickMode.hint||''));
+      sfx.click();
+    }
+    return;
+  }
+  if(S.busy) return;
   const p=cur(); if(p.isAI) return;
   const st=S.terr[id];
   
@@ -1513,72 +1580,186 @@ function dieEl(v,def){
   for(let i=0;i<9;i++){ const s=document.createElement('span'); if(PIPS[v].includes(i)) s.className='pip'; d.appendChild(s); }
   return d;
 }
-function openBattle(from,to){
-  const a=cur(), d=S.players[S.terr[to].o];
-  B={from,to,a,d};
-  a._battleLossA=0; a._battleLossD=0;
-  $('#battleSub').innerHTML=`<b style="color:${a.color.hex}">${a.name}</b> ataca <b style="color:${d.color.hex}">${d.name}</b>`;
-  $('#blog').innerHTML='';
-  const oldTag=$('#dTally'); if(oldTag) oldTag.remove();
-  drawBattle(); $('#mBattle').classList.add('on');
+function battleMods(a,d,from,to){
+  const sea = from&&to ? isSeaLink(from,to) : false;
+  return {
+    extraDie: !!(a.eff.artilharia || (a.eff.submarino && sea)),
+    wall: !!d.eff.wall,
+    naval: !!(a.eff.naval && sea),
+    dome: !!d.eff.dome,
+    submarino: !!(a.eff.submarino && sea),
+    sea
+  };
 }
-function drawBattle(rolls){
+function closeBattle(opts={}){
+  const res = B && B.resolve;
+  $('#mBattle').classList.remove('on');
+  $('#battleModal').classList.remove('defend-mode');
+  if(B && B.to) flash(B.to);
+  if(!opts.keepSel) S.sel=null;
+  B=null; S.busy=false;
+  render();
+  if(res) res(opts.result||'done');
+}
+function updateBattleControls(){
+  if(!B) return;
+  const A=armies(B.from), can=A>=2 && S.terr[B.to].o!==B.a.i;
+  const defMode = B.role==='defend';
+  $('#battleTitle').textContent = defMode ? 'Você está sob ataque' : 'Combate';
+  $('#battleModal').classList.toggle('defend-mode', defMode);
+  $('#btnRoll').textContent = defMode ? 'Defender — rolar dados' : 'Rolar dados';
+  $('#btnBlitz').textContent = defMode ? 'Defender sem parar' : 'Ataque total';
+  $('#btnRetreat').textContent = 'Encerrar combate';
+  // Em defesa, quem decide parar é o atacante (IA); o defensor só rola
+  $('#btnRetreat').style.display = defMode ? 'none' : '';
+  $('#btnRoll').disabled = !can || S.busy;
+  $('#btnBlitz').disabled = !can || S.busy;
+  $('#btnRetreat').disabled = S.busy;
+}
+function fillBattleBrief(){
+  if(!B) return;
   const {from,to,a,d}=B;
   const A=armies(from), D=armies(to);
-  const mods=battleMods(a,d);
-  $('#sideA').innerHTML=`<div class="who">Atacante · dados vermelhos</div><div class="terr-nm" style="color:${a.color.hex}">${byId[from].n}</div><div class="armies"><b>${A}</b> exércitos</div><div class="dicerow" id="dA"></div>`;
-  $('#sideD').innerHTML=`<div class="who">Defensor · dados amarelos</div><div class="terr-nm" style="color:${d.color.hex}">${byId[to].n}</div><div class="armies"><b>${D}</b> exércitos</div><div class="dicerow" id="dD"></div>`;
+  const youDef = d===me();
+  const youAtt = a===me();
+  $('#battleBrief').innerHTML=`
+    <div class="bb-card att">
+      <span class="bb-role">Atacante</span>
+      <div class="bb-player"><i class="bb-dot" style="background:${a.color.hex}"></i><span style="color:${a.color.hex}">${a.name}${youAtt?' (você)':''}</span></div>
+      <div class="bb-terr" style="color:${a.color.hex}">${byId[from].n}</div>
+      <div class="bb-meta"><b>${A}</b> exércitos · dados vermelhos</div>
+    </div>
+    <div class="bb-vs"><div class="arrow">⟶</div><div class="lbl">ataca</div></div>
+    <div class="bb-card def">
+      <span class="bb-role">Defensor${youDef?' · SEU território':''}</span>
+      <div class="bb-player"><i class="bb-dot" style="background:${d.color.hex}"></i><span style="color:${d.color.hex}">${d.name}${youDef?' (você)':''}</span></div>
+      <div class="bb-terr" style="color:${d.color.hex}">${byId[to].n}</div>
+      <div class="bb-meta"><b>${D}</b> exércitos · dados amarelos (até ${maxDefDice()})</div>
+    </div>`;
+  const sea=isSeaLink(from,to);
+  $('#battleRoute').innerHTML = `<b>${byId[from].n}</b> → <b>${byId[to].n}</b>${sea?' · <span class="sea-tag">rota marítima</span>':''}`;
+  $('#battleAlert').innerHTML = youDef
+    ? `<strong>${a.name}</strong> avança de <strong>${byId[from].n}</strong> contra o seu <strong>${byId[to].n}</strong>. Role os dados amarelos para defender!`
+    : '';
+}
+function openBattle(from,to){
+  const a=cur(), d=S.players[S.terr[to].o];
+  B={from,to,a,d, role:'attack', resolve:null};
+  a._battleLossA=0; a._battleLossD=0;
+  $('#blog').innerHTML='';
+  const oldTag=$('#dTally'); if(oldTag) oldTag.remove();
+  drawBattle();
+  updateBattleControls();
+  $('#mBattle').classList.add('on');
+}
+function openDefendBattle(from,to,a,d,L){
+  return new Promise(resolve=>{
+    S.busy=false; // libera interação do defensor humano
+    B={from,to,a,d, role:'defend', resolve, L, aiContinue:true};
+    a._battleLossA=0; a._battleLossD=0;
+    $('#blog').innerHTML='';
+    const oldTag=$('#dTally'); if(oldTag) oldTag.remove();
+    log(a, `ataca <em>${byId[to].n}</em> (seu) a partir de ${byId[from].n}.`);
+    drawBattle();
+    updateBattleControls();
+    $('#mBattle').classList.add('on');
+    sfx.hit();
+    setHint(`<b style="color:${a.color.hex}">${a.name}</b> ataca <b>${byId[to].n}</b> vindo de <b>${byId[from].n}</b>. Role os dados!`);
+  });
+}
+function drawBattle(rolls){
+  if(!B) return;
+  const {from,to,a,d}=B;
+  const A=armies(from), D=armies(to);
+  const mods=battleMods(a,d,from,to);
+  fillBattleBrief();
+  $('#sideA').innerHTML=`<div class="who">Atacante · vermelhos</div>
+    <div class="player-line" style="color:${a.color.hex}">${a.name}</div>
+    <div class="terr-nm" style="color:${a.color.hex}">${byId[from].n}</div>
+    <div class="armies"><b>${A}</b> exércitos</div>
+    <div class="dicerow" id="dA"></div>`;
+  $('#sideD').innerHTML=`<div class="who">Defensor · amarelos</div>
+    <div class="player-line" style="color:${d.color.hex}">${d.name}${d===me()?' · você':''}</div>
+    <div class="terr-nm" style="color:${d.color.hex}">${byId[to].n}</div>
+    <div class="armies"><b>${D}</b> exércitos</div>
+    <div class="dicerow" id="dD"></div>`;
   const pc=pConquer(A,D);
   $('#oddsN').textContent=(pc*100).toFixed(0)+'%';
   $('#oddsBar').style.width=(pc*100)+'%';
-  let note='';
-  if(mods.extraDie) note+=' 🎯 4 dados';
-  if(mods.wall) note+=' 🛡️ defesa reforçada';
-  $('#battleSub').innerHTML=`<b style="color:${a.color.hex}">${a.name}</b> ataca <b style="color:${d.color.hex}">${d.name}</b>${note?' · <span style="color:var(--brass)">'+note+'</span>':''}`;
-  $('#btnRoll').disabled = A<2;
-  $('#btnBlitz').disabled = A<2;
+  let note=[];
+  if(mods.extraDie||mods.submarino) note.push('4 dados de ataque');
+  if(mods.wall) note.push('muralha (+1 def)');
+  if(mods.naval) note.push('frota naval (+1 atk)');
+  if(mods.dome) note.push('domo de ferro ativo');
+  if(mods.sea) note.push('rota marítima');
+  const modeTxt = B.role==='defend'
+    ? `<span style="color:var(--alert)">Defesa ativa</span> — role para contestar o ataque`
+    : `<b style="color:${a.color.hex}">${a.name}</b> ataca <b style="color:${d.color.hex}">${d.name}</b>`;
+  $('#battleSub').innerHTML = modeTxt + (note.length?` · <span style="color:var(--brass)">${note.join(' · ')}</span>`:'');
+  updateBattleControls();
   if(rolls){
     const dA=$('#dA'), dD=$('#dD');
     rolls.aRaw.forEach((v,i)=>{ const e=dieEl(v,false); e.classList.add('settle'); if(i>=3) e.classList.add('faded'); dA.appendChild(e); });
     rolls.dRaw.forEach(v=>{ const e=dieEl(v,true); e.classList.add('settle'); dD.appendChild(e); });
     for(let i=0;i<rolls.cmp;i++){
       const ae=dA.children[i], de=dD.children[i];
+      if(!ae||!de) continue;
       if(rolls.pairs[i]==='a'){ ae.classList.add('win'); de.classList.add('lose'); }
       else { ae.classList.add('lose'); de.classList.add('win'); }
     }
     const tag=$('#dTally') || (()=>{const e=document.createElement('div'); e.id='dTally'; e.className='roundtag'; $('.odds').after(e); return e;})();
-    tag.textContent = `Neste combate: atacante perdeu ${a._battleLossA||0} · defensor perdeu ${a._battleLossD||0}`;
+    let tally=`Neste combate: atacante −${a._battleLossA||0} · defensor −${a._battleLossD||0}`;
+    if(rolls.domeSave) tally += ' · ⬡ Domo de Ferro salvou 1 exército';
+    tag.textContent = tally;
   }
 }
-function battleMods(a,d){ return {extraDie: !!a.eff.artilharia, wall: !!d.eff.wall}; }
 async function battleRound(){
+  if(!B) return false;
   const {from,to,a,d}=B;
-  if(armies(from)<2) return;
-  S.busy=true; $('#btnRoll').disabled=true; $('#btnBlitz').disabled=true;
-  const mods=battleMods(a,d);
+  if(armies(from)<2 || S.terr[to].o===a.i) return false;
+  S.busy=true; updateBattleControls();
+  const mods=battleMods(a,d,from,to);
   const r=resolveRound(armies(from),armies(to),mods);
   drawBattle(); const dA=$('#dA'), dD=$('#dD');
-  const nA=Math.min(mods.extraDie?4:3,armies(from)-1), nD=Math.min(2,armies(to));
+  const maxA=(mods.extraDie||mods.submarino)?4:3;
+  const nA=Math.min(maxA,armies(from)-1), nD=Math.min(maxDefDice(),armies(to));
   for(let i=0;i<nA;i++){const e=dieEl(1+rnd(6),false);e.classList.add('rolling');dA.appendChild(e);}
   for(let i=0;i<nD;i++){const e=dieEl(1+rnd(6),true);e.classList.add('rolling');dD.appendChild(e);}
   sfx.dice(); await wait(520);
-  a.eff.artilharia=false;
+  if(a.eff.artilharia) a.eff.artilharia=false;
+  if(a.eff.submarino && mods.sea) a.eff.submarino=false;
+  if(a.eff.naval && mods.sea) a.eff.naval=false;
+  if(r.domeSave) d.eff.dome=false;
   S.terr[from].a-=r.aLoss; S.terr[to].a-=r.dLoss;
   a.battles++; a.lost+=r.aLoss; d.lost+=r.dLoss;
   a._battleLossA=(a._battleLossA||0)+r.aLoss; a._battleLossD=(a._battleLossD||0)+r.dLoss;
   drawBattle(r);
   if(r.dLoss) sfx.hit();
   const bl=$('#blog');
-  bl.insertAdjacentHTML('afterbegin',`<div>🔴 ${r.aKept.join('  ')} <span style="color:var(--brass)">vs</span> 🟡 ${r.dEff.join('  ')} → <span class="${r.dLoss?'win':'lose'}">atacante ${r.aLoss?'-'+r.aLoss:'0'}</span> · <span class="${r.dLoss?'win':'lose'}">defensor ${r.dLoss?'-'+r.dLoss:'0'}</span></div>`);
+  const domeNote = r.domeSave ? ' · <span class="win">⬡ Domo salvou 1</span>' : '';
+  bl.insertAdjacentHTML('afterbegin',`<div>🔴 ${r.aKept.join('  ')} <span style="color:var(--brass)">vs</span> 🟡 ${r.dEff.join('  ')} → atk ${r.aLoss?'−'+r.aLoss:'0'} · def ${r.dLoss?'−'+r.dLoss:'0'}${domeNote}</div>`);
   render();
-  if(armies(to)===0){ await conquer(from,to,a,d,r); return true; }
-  S.busy=false; $('#btnRoll').disabled=armies(from)<2; $('#btnBlitz').disabled=armies(from)<2;
+  if(armies(to)<=0){ await conquer(from,to,a,d,r); return true; }
+  S.busy=false; updateBattleControls();
+  // Em modo defesa: a IA decide se continua o ataque
+  if(B && B.role==='defend' && B.aiContinue){
+    const L=B.L||LEVELS.normal;
+    const thr = PERSONAS[a.persona||'mediano']?.thr ?? .55;
+    const pc = pConquer(armies(from),armies(to));
+    if(armies(from)<2 || pc < Math.max(.18, thr-.12)){
+      log(a, `encerrou o ataque a ${byId[to].n}.`);
+      await wait(400);
+      closeBattle({result:'retreat'});
+      return true;
+    }
+  }
   renderActions();
   return false;
 }
 function applyConquest(from,to,a,d,n){
   S.terr[from].a -= n;
   S.terr[to].a = n + (a.eff.blitz?1:0);
+  if(a.eff.blitz) a.eff.blitz=false;
   if(ownedBy(d).length===0) eliminate(d,a);
 }
 async function conquer(from,to,a,d,r){
@@ -1590,43 +1771,198 @@ async function conquer(from,to,a,d,r){
   S.conquered++; a.conq++;
   log(a, `conquistou <em>${byId[to].n}</em> de ${d.name}.`);
   let n;
+  const res = B && B.resolve;
   if(a===me()){
     $('#mBattle').classList.remove('on');
     await sleep(140);
     n = maxMove>minMove ? await askMoveP('Ocupar território', `De ${byId[from].n} para ${byId[to].n}`, minMove, maxMove) : minMove;
   } else {
     n = clamp(Math.round((armies(from)-1)*.72), minMove, maxMove);
+    if(d===me()) sfx.lost();
   }
   applyConquest(from,to,a,d,n);
-  S.busy=false; S.sel=null; B=null;
+  $('#mBattle').classList.remove('on');
+  $('#battleModal').classList.remove('defend-mode');
+  B=null; S.busy=false; S.sel=null;
   render();
   checkVictory();
   render();
+  if(res) res('conquered');
   return true;
 }
-$('#btnRoll').onclick=()=>{ battleRound(); };
+$('#btnRoll').onclick=()=>{ if(!S.busy) battleRound(); };
 $('#btnBlitz').onclick=async()=>{
-  S.busy=true;
+  if(!B || S.busy) return;
+  S.busy=true; updateBattleControls();
   while(B && armies(B.from)>=2 && S.terr[B.to].o!==B.a.i && !S.gameOver){
     const done=await battleRound();
     if(done) break;
+    // Em defesa com blitz, a IA pode recuar entre rodadas (battleRound já fecha)
+    if(!B) break;
+    if(B.role==='defend'){
+      // se ainda aberto, continua rolando
+    }
     await wait(180);
   }
-  S.busy=false; renderActions();
+  if(B){ S.busy=false; updateBattleControls(); }
+  renderActions();
 };
-$('#btnRetreat').onclick=()=>{ $('#mBattle').classList.remove('on'); S.busy=false; S.sel=null; B=null; render(); };
-function usePower(p,idx){
+$('#btnRetreat').onclick=()=>{
+  if(S.busy) return;
+  if(B && B.role==='defend'){
+    log(B.a, `recuou do ataque a ${byId[B.to].n}.`);
+  }
+  closeBattle({result:'retreat'});
+};
+function pickTarget(hint, filterFn){
+  return new Promise(resolve=>{
+    S.pickMode={filter:filterFn, resolve, hint};
+    setHint(hint);
+    S.busy=false;
+    render();
+  });
+}
+function cancelPick(){
+  if(S.pickMode && S.pickMode.resolve) S.pickMode.resolve(null);
+  S.pickMode=null;
+}
+async function usePower(p,idx){
   const pid=p.powers[idx], pw=POWERS.find(x=>x.id===pid);
+  if(!pw) return;
   const consume=()=>{ p.powers.splice(idx,1); log(p,`usou <em>${pw.n}</em>.`); sfx.click(); render(); };
   if(pid==='mobilizacao'){ if(S.phase!=='reforco') return; S.reinf+=4; consume(); }
   else if(pid==='artilharia'){ p.eff.artilharia=true; consume(); }
   else if(pid==='muralha'){ p.eff.wall=true; consume(); }
   else if(pid==='blitz'){ p.eff.blitz=true; consume(); }
+  else if(pid==='frota_naval'){ p.eff.naval=true; consume(); }
+  else if(pid==='submarino'){ p.eff.submarino=true; consume(); }
+  else if(pid==='domo'){ p.eff.dome=true; consume(); }
+  else if(pid==='tregua'){
+    const foes=S.players.filter(x=>x.alive && x.i!==p.i);
+    if(!foes.length) return;
+    // escolhe o mais forte
+    const tgt = p.isAI ? foes.sort((a,b)=>ownedBy(b).length-ownedBy(a).length)[0]
+      : await (async()=>{
+          const id = await pickTarget('Clique no território de um oponente para impor trégua (ou Esc para cancelar).', id=>S.terr[id].o!==p.i);
+          return id!=null ? S.players[S.terr[id].o] : null;
+        })();
+    if(!tgt){ cancelPick(); return; }
+    p.eff.truceTarget=tgt.i;
+    tgt.eff.cannotAttack=p.i;
+    log(p, `impôs trégua a <em>${tgt.name}</em>.`);
+    consume();
+  }
+  else if(pid==='espionagem'){
+    const foes=S.players.filter(x=>x.alive && x.i!==p.i);
+    if(!foes.length) return;
+    let tgt;
+    if(p.isAI) tgt=foes[rnd(foes.length)];
+    else {
+      const id=await pickTarget('Clique em território inimigo para espionar o dono (Esc cancela).', id=>S.terr[id].o!==p.i);
+      if(id==null){ cancelPick(); return; }
+      tgt=S.players[S.terr[id].o];
+    }
+    if(!p.revealed) p.revealed={};
+    p.revealed[tgt.i]=objectiveText(tgt);
+    if(p===me()) setHint(`Inteligência: <b style="color:${tgt.color.hex}">${tgt.name}</b> — ${objectiveText(tgt)}`);
+    log(p, `espionou o objetivo de <em>${tgt.name}</em>.`);
+    consume();
+  }
+  else if(pid==='sabotagem'){
+    let id;
+    if(p.isAI){
+      const cands=TERRS.map(t=>t.id).filter(x=>S.terr[x].o!==p.i && armies(x)>1);
+      if(!cands.length) return;
+      id=cands.sort((a,b)=>armies(b)-armies(a))[0];
+    } else {
+      id=await pickTarget('Clique em território inimigo para sabotagem (remove até 2, Esc cancela).', x=>S.terr[x].o!==p.i && armies(x)>1);
+      if(id==null){ cancelPick(); return; }
+    }
+    const rem=Math.min(2, armies(id)-1);
+    S.terr[id].a-=rem;
+    const own=S.players[S.terr[id].o];
+    own.lost+=rem;
+    log(p, `sabotou <em>${byId[id].n}</em> (−${rem} exércitos de ${own.name}).`);
+    flash(id); sfx.hit(); consume();
+  }
+  else if(pid==='ataque_aereo'){
+    let id;
+    if(p.isAI){
+      const cands=TERRS.map(t=>t.id).filter(x=>S.terr[x].o!==p.i && armies(x)>=1);
+      if(!cands.length) return;
+      id=cands.sort((a,b)=>armies(b)-armies(a))[0];
+    } else {
+      id=await pickTarget('Ataque aéreo: clique em QUALQUER território inimigo (Esc cancela).', x=>S.terr[x].o!==p.i);
+      if(id==null){ cancelPick(); return; }
+    }
+    const dmg=1+rnd(2);
+    const rem=Math.min(dmg, Math.max(0, armies(id)-1));
+    // se só 1 exército, remove 0 ou permite deixar 1 (não conquiste via ar)
+    const kill=armies(id)<=1 ? 0 : Math.min(dmg, armies(id)-1);
+    S.terr[id].a-=kill;
+    const own=S.players[S.terr[id].o];
+    own.lost+=kill;
+    log(p, `bombardeou <em>${byId[id].n}</em> (−${kill} exército${kill!==1?'s':''}).`);
+    flash(id); ripple(id,aColorOr(p)); sfx.hit(); consume();
+  }
+  else if(pid==='drone'){
+    let id;
+    const adjEnemy=()=>{
+      const set=new Set();
+      ownedBy(p).forEach(o=>enemiesOf(o,p).forEach(e=>set.add(e)));
+      return [...set];
+    };
+    if(p.isAI){
+      const cands=adjEnemy().filter(x=>armies(x)>=1);
+      if(!cands.length) return;
+      id=cands[rnd(cands.length)];
+    } else {
+      id=await pickTarget('Drones: clique em inimigo ADJACENTE (Esc cancela).', x=>S.terr[x].o!==p.i && ADJ[x].some(y=>isMine(y,p)));
+      if(id==null){ cancelPick(); return; }
+    }
+    const before=armies(id);
+    const kill=before>1?1:0;
+    S.terr[id].a-=kill;
+    const own=S.players[S.terr[id].o];
+    own.lost+=kill;
+    log(p, `drones sobre <em>${byId[id].n}</em>: ${before}→${armies(id)} exércitos (${own.name}).`);
+    if(p===me()) setHint(`Reconhecimento: <b>${byId[id].n}</b> tem <b>${armies(id)}</b> exércitos.`);
+    flash(id); sfx.click(); consume();
+  }
+  else if(pid==='ponte'){
+    if(S.phase!=='remanejar' && !p.isAI) return;
+    if(p.isAI){
+      const own=ownedBy(p).filter(id=>armies(id)>1);
+      if(own.length<2) return;
+      const src=own.sort((a,b)=>armies(b)-armies(a))[0];
+      const dst=ownedBy(p).filter(id=>id!==src).sort((a,b)=>threat(b,p)-threat(a,p))[0];
+      if(!dst) return;
+      const n=Math.min(5,armies(src)-1);
+      S.terr[src].a-=n; S.terr[dst].a+=n;
+      log(p, `ponte aérea: ${n} de ${byId[src].n} → ${byId[dst].n}.`);
+      consume(); return;
+    }
+    setHint('Ponte Aérea: clique na ORIGEM (seu território com 2+ exércitos).');
+    S.pickMode={type:'ponte_src', resolve:null, hint:'origem'};
+    // handled in onTerrClick via pickMode.type
+    const src=await pickTarget('Ponte Aérea: escolha a ORIGEM (seu, 2+ exércitos). Esc cancela.', id=>isMine(id,p)&&armies(id)>=2);
+    if(src==null){ cancelPick(); return; }
+    const dst=await pickTarget(`Ponte Aérea: escolha o DESTINO a partir de ${byId[src].n}.`, id=>isMine(id,p)&&id!==src);
+    if(dst==null){ cancelPick(); return; }
+    const maxN=Math.min(5,armies(src)-1);
+    const n = maxN>1 ? await askMoveP('Ponte Aérea', `${byId[src].n} → ${byId[dst].n}`, 1, maxN) : maxN;
+    S.terr[src].a-=n; S.terr[dst].a+=n;
+    log(p, `ponte aérea: <em>${n}</em> de ${byId[src].n} → ${byId[dst].n}.`);
+    sfx.place(); consume();
+  }
 }
+function aColorOr(p){ return p.color?.hex || '#c4a860'; }
 function beginTurn(p){
   S.phase='reforco'; S.sel=null; S.conquered=0; S.placed={};
-  S.srcUsed=new Set(); S.gotArmies=new Set();
+  S.srcUsed=new Set(); S.gotArmies=new Set(); S.pickMode=null;
   p.eff.wall=false; p.eff.blitz=false; p.eff.artilharia=false;
+  p.eff.naval=false; p.eff.submarino=false;
+  // dome e trégua: dome persiste até usado; trégua is on target
   S.reinf = computeReinf(p) + (p.pendingReinf||0); p.pendingReinf=0;
   S.mustTrade = !p.isAI && p.cards.length>=5;
   sfx.turn();
@@ -1672,8 +2008,10 @@ function concludeTurn(){
       log(p,`recebeu <em>${POWERS.find(x=>x.id===pw).n}</em>.`);
     }
   }
-  p.eff.blitz=false; p.eff.artilharia=false; p.eff.cannotAttack=undefined;
-  S.sel=null;
+  p.eff.blitz=false; p.eff.artilharia=false; p.eff.naval=false; p.eff.submarino=false;
+  // cannotAttack (trégua) limpa no fim do turno de quem estava proibido
+  if(p.eff.cannotAttack!=null) p.eff.cannotAttack=undefined;
+  S.sel=null; S.pickMode=null;
   if(checkVictory()){ render(); return; }
   advance();
 }
@@ -1776,11 +2114,20 @@ async function aiAttack(p,K,L){
 }
 async function aiBattle(p,from,to,L){
   const d=S.players[S.terr[to].o];
+  // Humano defende rolando os dados (quando a opção está ativa)
+  if(!d.isAI && S.settings.defRoll){
+    await openDefendBattle(from,to,p,d,L);
+    S.busy=true; // retoma o turno da IA
+    return;
+  }
   let guard=0;
   while(armies(from)>=2 && S.terr[to].o!==p.i && guard++<80 && !S.gameOver){
-    const mods={extraDie:!!p.eff.artilharia, wall:!!d.eff.wall};
+    const mods=battleMods(p,d,from,to);
     const r=resolveRound(armies(from),armies(to),mods);
-    p.eff.artilharia=false;
+    if(p.eff.artilharia) p.eff.artilharia=false;
+    if(p.eff.submarino && mods.sea) p.eff.submarino=false;
+    if(p.eff.naval && mods.sea) p.eff.naval=false;
+    if(r.domeSave) d.eff.dome=false;
     S.terr[from].a-=r.aLoss; S.terr[to].a-=r.dLoss;
     p.battles++; p.lost+=r.aLoss; d.lost+=r.dLoss;
     flash(to); sfx.dice();
@@ -1800,6 +2147,29 @@ async function aiBattle(p,from,to,L){
     render(); await wait(130);
   }
   sfx.hit();
+}
+function aiUsePowers(p,L){
+  if(!S.settings.powers || !p.powers.length) return;
+  if(Math.random()>L.powerUse) return;
+  // Prioriza domo se ameaçado, muralha, artilharia, etc.
+  const tryUse=id=>{
+    const i=p.powers.indexOf(id);
+    if(i<0) return false;
+    // uso síncrono para buffs simples
+    if(id==='domo'){ p.eff.dome=true; p.powers.splice(i,1); log(p,'usou <em>Domo de Ferro</em>.'); return true; }
+    if(id==='muralha'){ p.eff.wall=true; p.powers.splice(i,1); log(p,'usou <em>Muralha de Ferro</em>.'); return true; }
+    if(id==='artilharia' && S.phase==='ataque'){ p.eff.artilharia=true; p.powers.splice(i,1); log(p,'usou <em>Artilharia Pesada</em>.'); return true; }
+    if(id==='frota_naval' && S.phase==='ataque'){ p.eff.naval=true; p.powers.splice(i,1); log(p,'usou <em>Frota Naval</em>.'); return true; }
+    if(id==='submarino' && S.phase==='ataque'){ p.eff.submarino=true; p.powers.splice(i,1); log(p,'usou <em>Emboscada Naval</em>.'); return true; }
+    if(id==='blitz' && S.phase==='ataque'){ p.eff.blitz=true; p.powers.splice(i,1); log(p,'usou <em>Blitzkrieg</em>.'); return true; }
+    if(id==='mobilizacao' && S.phase==='reforco'){ S.reinf+=4; p.powers.splice(i,1); log(p,'usou <em>Mobilização Geral</em>.'); return true; }
+    return false;
+  };
+  if(S.phase==='reforco') tryUse('mobilizacao');
+  // se tem fronteira perigosa, fortifica
+  const borderThreat = ownedBy(p).some(id=>threat(id,p)>=armies(id)+3);
+  if(borderThreat){ tryUse('domo'); tryUse('muralha'); }
+  if(S.phase==='ataque'){ tryUse('artilharia'); tryUse('blitz'); tryUse('frota_naval'); }
 }
 async function aiFortify(p,K,L){
   const maxMoves=Math.max(1,Math.round(2*K.fort));
@@ -1828,14 +2198,58 @@ async function aiTurn(p){
   const stale=()=>S.epoch!==epoch;
   await wait(420); if(stale())return;
   aiTrade(p,L); render(); await wait(230); if(stale())return;
+  S.phase='reforco'; aiUsePowers(p,L);
   await aiPlace(p,K,L); if(stale())return;
   if(S.gameOver) return;
-  S.phase='ataque'; render(); await wait(240); if(stale())return;
+  S.phase='ataque'; aiUsePowers(p,L); render(); await wait(240); if(stale())return;
+  // poderes ofensivos pontuais (ar, drones, sabotagem)
+  await aiOffensivePowers(p,L); if(stale())return;
   await aiAttack(p,K,L); if(stale())return;
   if(S.gameOver) return;
   S.phase='remanejar'; S.srcUsed=new Set(); S.gotArmies=new Set(); render(); await wait(220); if(stale())return;
   await aiFortify(p,K,L); if(stale())return;
   await wait(240);
+}
+async function aiOffensivePowers(p,L){
+  if(!S.settings.powers || Math.random()>L.powerUse*.7) return;
+  const idxOf=id=>p.powers.indexOf(id);
+  // Ataque aéreo no alvo mais gordo
+  let i=idxOf('ataque_aereo');
+  if(i>=0){
+    const cands=TERRS.map(t=>t.id).filter(x=>S.terr[x].o!==p.i && armies(x)>2);
+    if(cands.length){
+      const id=cands.sort((a,b)=>armies(b)-armies(a))[0];
+      const kill=Math.min(1+rnd(2), armies(id)-1);
+      S.terr[id].a-=kill; S.players[S.terr[id].o].lost+=kill;
+      p.powers.splice(i,1);
+      log(p,`bombardeou <em>${byId[id].n}</em> (−${kill}).`);
+      flash(id); await wait(200);
+    }
+  }
+  i=idxOf('drone');
+  if(i>=0){
+    const set=new Set(); ownedBy(p).forEach(o=>enemiesOf(o,p).forEach(e=>set.add(e)));
+    const cands=[...set].filter(x=>armies(x)>1);
+    if(cands.length){
+      const id=cands[rnd(cands.length)];
+      S.terr[id].a--; S.players[S.terr[id].o].lost++;
+      p.powers.splice(i,1);
+      log(p,`drones sobre <em>${byId[id].n}</em> (−1).`);
+      flash(id); await wait(160);
+    }
+  }
+  i=idxOf('sabotagem');
+  if(i>=0 && Math.random()<.55){
+    const cands=TERRS.map(t=>t.id).filter(x=>S.terr[x].o!==p.i && armies(x)>2);
+    if(cands.length){
+      const id=cands.sort((a,b)=>armies(b)-armies(a))[0];
+      const rem=Math.min(2,armies(id)-1);
+      S.terr[id].a-=rem; S.players[S.terr[id].o].lost+=rem;
+      p.powers.splice(i,1);
+      log(p,`sabotou <em>${byId[id].n}</em> (−${rem}).`);
+      flash(id); await wait(160);
+    }
+  }
 }
 function endGame(win,why){
   S.gameOver=true; S.busy=false; S.sel=null;
@@ -1893,7 +2307,9 @@ $('#btnStart').onclick=async()=>{
       name:$('#setName').value.trim()||'Comandante',
       objMode:$('#setObjMode').value,
       powers:$('#setPowers').checked,
-      min3:$('#setMin3').checked
+      min3:$('#setMin3').checked,
+      warDice:$('#setWarDice').checked,
+      defRoll:$('#setDefRoll').checked
     });
   }catch(e){
     console.error('Erro ao iniciar:', e);
@@ -1923,15 +2339,25 @@ function openStats(){
 $('#btnStats').onclick=()=>{ openStats(); sfx.click(); };
 $('#statsClose').onclick=()=>$('#mStats').classList.remove('on');
 $('#btnRules').onclick=()=>{
+  const md=maxDefDice();
   $('#rulesBody').innerHTML=`
-    <h4 style="color:var(--brass);margin:0 0 8px">Combate</h4>
-    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Atacante rola até <b style="color:var(--bone)">3 dados</b> (exércitos − 1). Defensor até <b style="color:var(--bone)">2 dados</b>. Compara-se o maior com o maior; <b style="color:var(--bone)">empate favorece a defesa</b>.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Combate (regras War)</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Atacante rola até <b style="color:var(--bone)">3 dados</b> (exércitos − 1). Defensor até <b style="color:var(--bone)">${md} dados</b>${S.settings.warDice?' (oficial Grow)':' (estilo Risk)'}. Compara-se o maior com o maior; <b style="color:var(--bone)">empate favorece a defesa</b>. Quando você é atacado, o painel de combate abre para você rolar os dados amarelos.</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Reforços</h4>
-    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada turno: metade dos territórios (mín. 3 se a opção estiver ativa) + bônus de continentes dominados.</p>
-    <h4 style="color:var(--brass);margin:0 0 8px">Cartas</h4>
-    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Conquiste ao menos 1 território no turno para receber carta. Três símbolos iguais, um de cada, ou com coringa formam um conjunto. Com 5 cartas a troca é obrigatória.</p>
-    <h4 style="color:var(--brass);margin:0 0 8px">Controles (touch)</h4>
-    <p style="margin:0;line-height:1.55;font-size:13px;color:var(--muted)">Arraste o mapa, pinça para zoom, toque duplo para aproximar. Use as abas <b style="color:var(--bone)">Exércitos / Mapa / Comando</b> no tablet e celular.</p>`;
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada turno: metade dos territórios (mín. 3 se a opção estiver ativa) + bônus de continentes dominados (NA 5 · EU 5 · Ásia 7 · África 3 · SA/OC 2).</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Cartas de território</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Conquiste ≥1 território no turno para receber carta. Três iguais, um de cada, ou com coringa formam conjunto. Com 5 cartas a troca é obrigatória.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Guerra moderna (cartas de estratégia)</h4>
+    <p style="margin:0 0 8px;line-height:1.55;font-size:13px;color:var(--muted)">Conquiste 2+ territórios no mesmo turno para receber uma carta. Destaques:</p>
+    <ul style="margin:0 0 12px;padding-left:18px;font-size:12.5px;color:var(--muted);line-height:1.6">
+      <li><b style="color:var(--bone)">Ataque Aéreo</b> — bombardeia qualquer território (1–2 baixas, sem conquistar)</li>
+      <li><b style="color:var(--bone)">Frota Naval / Submarino</b> — bônus em ataques por rota marítima</li>
+      <li><b style="color:var(--bone)">Enxame de Drones</b> — −1 em inimigo adjacente + reconhecimento</li>
+      <li><b style="color:var(--bone)">Domo de Ferro</b> — anula a 1ª perda na próxima defesa</li>
+      <li><b style="color:var(--bone)">Ponte Aérea</b> — remaneja até 5 exércitos entre territórios não adjacentes</li>
+    </ul>
+    <h4 style="color:var(--brass);margin:0 0 8px">Controles</h4>
+    <p style="margin:0;line-height:1.55;font-size:13px;color:var(--muted)">Arraste o mapa, pinça para zoom. <b style="color:var(--bone)">Enter</b> rola dados no combate · <b style="color:var(--bone)">Esc</b> cancela seleção. Abas no mobile: Exércitos / Mapa / Comando.</p>`;
   $('#mRules').classList.add('on');
 };
 $('#rulesClose').onclick=()=>$('#mRules').classList.remove('on');
@@ -1951,12 +2377,17 @@ $$('.tabs .btn').forEach(b=>b.onclick=()=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    if($('#mBattle').classList.contains('on')){ $('#btnRetreat').click(); return; }
+    if(S.pickMode){ cancelPick(); setHint('Ação cancelada.'); render(); return; }
+    if($('#mBattle').classList.contains('on')){
+      if(B && B.role==='defend') return; // defensor não fecha à força
+      $('#btnRetreat').click(); return;
+    }
     if($('#mStats').classList.contains('on')){ $('#mStats').classList.remove('on'); return; }
     if($('#mRules').classList.contains('on')){ $('#mRules').classList.remove('on'); return; }
     if(S.sel){ S.sel=null; render(); }
   }
   if(e.key==='Enter' && $('#mMove').classList.contains('on')) $('#moveOk').click();
+  if(e.key==='Enter' && $('#mBattle').classList.contains('on') && B && !S.busy){ $('#btnRoll').click(); }
 });
 S.players=[{i:0,name:'—',color:COLORS[0],isAI:false,cards:[],powers:[],alive:true,eff:{},conq:0,lost:0,battles:0,kills:0}];
 S.order=[0]; TERRS.forEach(t=>S.terr[t.id]={o:0,a:1});
