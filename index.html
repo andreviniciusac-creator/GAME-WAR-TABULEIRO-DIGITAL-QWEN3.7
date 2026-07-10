@@ -357,7 +357,7 @@ body.board-paper #app{background:transparent}
       <button class="btn bad" id="btnNew">Nova partida</button>
     </div>
   </div>
-  <div class="net-bar" id="netBar"><span id="netStatus">Rede offline</span><span id="netRoom"></span></div>
+  <div class="net-bar" id="netBar" hidden style="display:none"><span id="netStatus">Rede offline</span><span id="netRoom"></span></div>
   <div class="tabs">
     <button class="btn sm" data-tab="left">Exércitos</button>
     <button class="btn sm" data-tab="map">Mapa</button>
@@ -458,8 +458,8 @@ body.board-paper #app{background:transparent}
             <option value="capitais">Domínio estratégico — 6 centros</option>
           </select>
         </div>
-        <div class="field"><span>Humanos (hotseat / rede)</span>
-          <select id="setHumans"><option value="1" selected>1 humano + IAs</option><option value="2">2 humanos</option><option value="3">3 humanos</option></select>
+        <div class="field"><span>Humanos (mesmo aparelho)</span>
+          <select id="setHumans"><option value="1" selected>1 humano + IAs</option><option value="2">2 humanos (hotseat)</option><option value="3">3 humanos (hotseat)</option></select>
         </div>
         <div class="field"><span>Regras opcionais</span>
           <label class="chk"><input type="checkbox" id="setPowers" checked> Cartas de estratégia e guerra moderna</label>
@@ -469,15 +469,6 @@ body.board-paper #app{background:transparent}
           <label class="chk"><input type="checkbox" id="setSeasons" checked> Clima e estações</label>
           <label class="chk"><input type="checkbox" id="setMissions" checked> Missões dinâmicas</label>
           <label class="chk"><input type="checkbox" id="setCapitals" checked> Capitais por jogador + centros</label>
-        </div>
-        <div class="field"><span>Multiplayer online (WebSocket)</span>
-          <input type="text" id="setNetUrl" placeholder="ws://localhost:3080" value="ws://localhost:3080">
-          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
-            <button type="button" class="btn sm" id="btnNetHost">Hospedar sala</button>
-            <button type="button" class="btn sm" id="btnNetJoin">Entrar na sala</button>
-            <input type="text" id="setRoom" placeholder="código da sala" maxlength="8" style="flex:1;min-width:100px">
-          </div>
-          <div id="netSetupMsg" style="font-size:11.5px;color:var(--muted);margin-top:6px"></div>
         </div>
       </div>
     </div>
@@ -2133,10 +2124,13 @@ function drawBattle(rolls){
     tag.textContent = tally;
   }
 }
+/** Tempo para ler o resultado dos dados (defesa ~3s) */
+const DICE_RESULT_MS = 3000;
 async function battleRound(){
   if(!B) return false;
   const {from,to,a,d}=B;
   if(armies(from)<2 || S.terr[to].o===a.i) return false;
+  const defendMode = B.role==='defend';
   S.busy=true; updateBattleControls();
   const mods=battleMods(a,d,from,to);
   const r=resolveRound(armies(from),armies(to),mods);
@@ -2145,7 +2139,8 @@ async function battleRound(){
   const nA=Math.min(maxA,armies(from)-1), nD=Math.min(maxDefDice(),armies(to));
   for(let i=0;i<nA;i++){const e=dieEl(1+rnd(6),false);e.classList.add('rolling');dA.appendChild(e);}
   for(let i=0;i<nD;i++){const e=dieEl(1+rnd(6),true);e.classList.add('rolling');dD.appendChild(e);}
-  sfx.dice(); await wait(520);
+  // Animação de rolagem (tempo real — não escala com velocidade da IA)
+  sfx.dice(); await sleep(defendMode ? 750 : 550);
   if(a.eff.artilharia) a.eff.artilharia=false;
   if(a.eff.submarino && mods.sea) a.eff.submarino=false;
   if(a.eff.naval && mods.sea) a.eff.naval=false;
@@ -2158,17 +2153,37 @@ async function battleRound(){
   const bl=$('#blog');
   const domeNote = r.domeSave ? ' · <span class="win">⬡ Domo salvou 1</span>' : '';
   bl.insertAdjacentHTML('afterbegin',`<div>🔴 ${r.aKept.join('  ')} <span style="color:var(--brass)">vs</span> 🟡 ${r.dEff.join('  ')} → atk ${r.aLoss?'−'+r.aLoss:'0'} · def ${r.dLoss?'−'+r.dLoss:'0'}${domeNote}</div>`);
-  render();
+  // Atualiza mapa sem recriar o modal (dados ficam visíveis)
+  renderPlayers(); renderConts(); renderStrat(); renderMission();
+  if(gTerr){
+    TERRS.forEach(t=>{
+      const g=gTerr.querySelector(`[data-id="${t.id}"]`);
+      if(!g) return;
+      const st=S.terr[t.id], own=S.players[st.o];
+      const txt=g.querySelector('.badge text');
+      if(txt) txt.textContent=st.a;
+      const poly=g.querySelector('.tp');
+      if(poly) poly.setAttribute('fill', own.color.hex);
+    });
+  }
+  // Pausa real para ler o resultado — defesa: 3s (independente da velocidade da IA)
+  if(defendMode){
+    const tag=$('#dTally');
+    if(tag) tag.textContent = (tag.textContent||'').replace(/\s*·\s*lendo resultado…/,'') + '  ·  lendo resultado…';
+    await sleep(DICE_RESULT_MS);
+    if(tag) tag.textContent = (tag.textContent||'').replace(/\s*·\s*lendo resultado…/,'');
+  }
+  if(!B) return true;
   if(armies(to)<=0){ await conquer(from,to,a,d,r); return true; }
   S.busy=false; updateBattleControls();
-  // Em modo defesa: a IA decide se continua o ataque
+  // Em modo defesa: a IA decide se continua o ataque (já deu tempo de ver os dados)
   if(B && B.role==='defend' && B.aiContinue){
     const L=B.L||LEVELS.normal;
     const thr = PERSONAS[a.persona||'mediano']?.thr ?? .55;
     const pc = pConquer(armies(from),armies(to));
     if(armies(from)<2 || pc < Math.max(.18, thr-.12)){
       log(a, `encerrou o ataque a ${byId[to].n}.`);
-      await wait(400);
+      await sleep(700);
       closeBattle({result:'retreat'});
       return true;
     }
@@ -2225,12 +2240,9 @@ $('#btnBlitz').onclick=async()=>{
   while(B && armies(B.from)>=2 && S.terr[B.to].o!==B.a.i && !S.gameOver){
     const done=await battleRound();
     if(done) break;
-    // Em defesa com blitz, a IA pode recuar entre rodadas (battleRound já fecha)
     if(!B) break;
-    if(B.role==='defend'){
-      // se ainda aberto, continua rolando
-    }
-    await wait(180);
+    // Na defesa a pausa de 3s já ocorre em battleRound; no ataque só um respiro curto
+    if(B.role!=='defend') await wait(220);
   }
   if(B){ S.busy=false; updateBattleControls(); }
   renderActions();
@@ -2809,8 +2821,10 @@ $('#btnRules').onclick=()=>{
     <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada rodada completa a estação muda: <b style="color:var(--bone)">inverno siberiano</b>, monções no verão, tempestades no outono em rotas marítimas.</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Missões dinâmicas</h4>
     <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Objetivos mid-game (segurar Suez, conquistar Japão…). Completar concede reforços bônus.</p>
-    <h4 style="color:var(--brass);margin:0 0 8px">Diplomacia & multiplayer</h4>
-    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Alianças temporárias e troca de cartas entre humanos. Hotseat no mesmo aparelho ou WebSocket (<code style="color:var(--bone)">node server.mjs</code>).</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Diplomacia</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Alianças temporárias e troca de cartas entre humanos no mesmo aparelho (hotseat). Multiplayer online está desativado nesta versão.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Defesa</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Ao ser atacado, role os dados amarelos. O resultado fica na tela por cerca de <b style="color:var(--bone)">3 segundos</b> para você ler antes do próximo passo.</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Reforços</h4>
     <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada turno: metade dos territórios (mín. 3 se a opção estiver ativa) + bônus de continentes dominados (NA 5 · EU 5 · Ásia 7 · África 3 · SA/OC 2).</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Cartas de território</h4>
@@ -2888,13 +2902,17 @@ $('#btnDiplomacy').onclick=()=>{ openDiplo(); sfx.click(); };
 $('#diploClose').onclick=()=>$('#mDiplo').classList.remove('on');
 
 /* ——— Multiplayer WebSocket (opcional) ——— */
+/** Multiplayer online desativado na UI — funções viram no-op */
+const ONLINE_ENABLED = false;
 function netSetStatus(msg, cls){
+  if(!ONLINE_ENABLED) return;
   const el=$('#netStatus'); if(!el) return;
   el.className=cls||'';
   el.textContent=msg;
   $('#netBar').classList.add('on');
 }
 function netBroadcastState(){
+  if(!ONLINE_ENABLED) return;
   if(!S.net.ws || S.net.ws.readyState!==1 || S.net.role!=='host') return;
   try{
     const payload={
@@ -2946,25 +2964,10 @@ function netConnect(url, role){
     }catch(e){ reject(e); }
   });
 }
-$('#btnNetHost').onclick=async()=>{
-  const url=$('#setNetUrl').value.trim()||'ws://localhost:3080';
-  try{
-    await netConnect(url,'host');
-    S.net.ws.send(JSON.stringify({type:'host', room:$('#setRoom').value.trim()||undefined}));
-    $('#netSetupMsg').textContent='Hospedando. Peça aos outros para entrar com o código da sala. Rode: node server.mjs';
-    netSetStatus('Host online','ok');
-  }catch(e){ $('#netSetupMsg').textContent='Não conectou. Inicie o servidor: node server.mjs'; }
-};
-$('#btnNetJoin').onclick=async()=>{
-  const url=$('#setNetUrl').value.trim()||'ws://localhost:3080';
-  const room=$('#setRoom').value.trim();
-  if(!room){ $('#netSetupMsg').textContent='Informe o código da sala.'; return; }
-  try{
-    await netConnect(url,'client');
-    S.net.ws.send(JSON.stringify({type:'join', room}));
-    $('#netSetupMsg').textContent='Entrando na sala '+room+'…';
-  }catch(e){ $('#netSetupMsg').textContent='Falha ao entrar. Servidor rodando?'; }
-};
+// Botões de rede removidos do setup (ONLINE_ENABLED=false)
+if(ONLINE_ENABLED){
+  // reativar UI e handlers se ONLINE_ENABLED voltar a true
+}
 $$('.tabs .btn').forEach(b=>b.onclick=()=>{
   const t=b.dataset.tab;
   $$('.tabs .btn').forEach(x=>x.classList.toggle('primary', x===b));
