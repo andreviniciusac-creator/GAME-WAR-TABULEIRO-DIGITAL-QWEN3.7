@@ -266,6 +266,68 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
   .btn:hover{background:rgba(255,255,255,.03)}
   .btn:active{background:rgba(200,155,60,.15)}
 }
+/* —— Tabuleiro físico / estações / unidades / dados 3D —— */
+body.board-paper{
+  background:
+    radial-gradient(ellipse at 30% 20%,rgba(60,80,50,.12),transparent 50%),
+    radial-gradient(ellipse at 70% 80%,rgba(40,50,70,.2),transparent 45%),
+    #0c1016;
+}
+body.board-paper #app{background:transparent}
+.mapwrap.paper{
+  background:
+    linear-gradient(165deg,rgba(42,58,48,.55) 0%,rgba(18,28,36,.92) 40%,rgba(10,14,18,.98) 100%);
+  border-color:rgba(180,150,90,.35);
+  box-shadow:inset 0 0 80px rgba(0,0,0,.35),0 8px 32px rgba(0,0,0,.45);
+}
+.mapwrap.paper::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='.9'/%3E%3C/svg%3E");
+}
+.season-banner{
+  position:absolute;left:12px;bottom:12px;z-index:6;
+  padding:7px 12px;border-radius:8px;font-size:11.5px;line-height:1.35;
+  background:rgba(8,12,18,.88);border:1px solid var(--line2);max-width:min(280px,70vw);
+  color:var(--muted);pointer-events:none;
+}
+.season-banner b{color:var(--brass);display:block;font-size:12px;margin-bottom:2px}
+.season-banner.inverno{border-color:rgba(140,180,220,.4)}
+.season-banner.verao{border-color:rgba(220,160,60,.35)}
+.season-banner.moncao{border-color:rgba(60,160,140,.45)}
+.badge .unit-row{font-size:9px;fill:rgba(255,255,255,.75);text-anchor:middle;pointer-events:none}
+.cap-star{fill:#f0d060;stroke:#3a2a08;stroke-width:1;pointer-events:none;filter:drop-shadow(0 0 3px rgba(240,208,96,.6))}
+.terr.capital .tp{stroke-dasharray:4 3}
+.die{
+  transform-style:preserve-3d;perspective:200px;
+  box-shadow:0 6px 14px -4px #000,inset 0 -3px 0 rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.22),0 0 0 1px rgba(0,0,0,.25);
+}
+.die.rolling{animation:tumble3d .55s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes tumble3d{
+  0%{transform:rotateX(0) rotateY(0) translateY(0)}
+  25%{transform:rotateX(90deg) rotateY(-40deg) translateY(-8px)}
+  50%{transform:rotateX(180deg) rotateY(80deg) translateY(2px)}
+  75%{transform:rotateX(270deg) rotateY(-20deg) translateY(-6px)}
+  100%{transform:rotateX(360deg) rotateY(0) translateY(0)}
+}
+.mission-card{
+  padding:10px;border-radius:9px;border:1px solid rgba(196,168,96,.3);
+  background:linear-gradient(135deg,rgba(196,168,96,.1),rgba(0,0,0,.2));margin-bottom:8px;
+}
+.mission-card .mh{font-size:12px;font-weight:700;color:var(--brass);margin-bottom:4px}
+.mission-card .md{font-size:11.5px;color:var(--muted);line-height:1.45}
+.mission-card .mp{font-family:var(--mono);font-size:11px;color:var(--verdigris);margin-top:6px}
+.alliance-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(148,170,200,.1);font-size:12.5px}
+.alliance-row:last-child{border-bottom:0}
+.net-bar{display:none;align-items:center;gap:8px;padding:6px 12px;background:rgba(40,80,120,.25);border-bottom:1px solid var(--line2);font-size:12px;flex-wrap:wrap}
+.net-bar.on{display:flex}
+.net-bar .ok{color:var(--verdigris)}
+.net-bar .warn{color:#e0b430}
+.climate-chip{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.04em;margin-left:6px}
+.climate-chip.cold{background:rgba(120,170,220,.2);color:#a8d0f0}
+.climate-chip.hot{background:rgba(220,140,40,.2);color:#f0c080}
+.climate-chip.wet{background:rgba(60,160,140,.2);color:#8fe0c8}
+.unit-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted);margin-top:6px}
+.unit-legend span{display:inline-flex;align-items:center;gap:3px}
 </style>
 </head>
 <body>
@@ -289,11 +351,13 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
         <option value="normal" selected>Normal</option>
         <option value="lento">Lento</option>
       </select>
+      <button class="btn" id="btnDiplomacy" title="Diplomacia">Diplomacia</button>
       <button class="btn" id="btnStats">Estatísticas</button>
       <button class="btn" id="btnRules">Regras</button>
       <button class="btn bad" id="btnNew">Nova partida</button>
     </div>
   </div>
+  <div class="net-bar" id="netBar"><span id="netStatus">Rede offline</span><span id="netRoom"></span></div>
   <div class="tabs">
     <button class="btn sm" data-tab="left">Exércitos</button>
     <button class="btn sm" data-tab="map">Mapa</button>
@@ -310,17 +374,26 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
         <div class="body" id="conts"></div>
       </div>
       <div class="panel">
+        <h3>Centros estratégicos <span class="tag" id="tagStrat"></span></h3>
+        <div class="body" id="stratList"></div>
+      </div>
+      <div class="panel">
         <h3>Exibição</h3>
         <div class="body">
           <label class="chk"><input type="checkbox" id="optLinks" checked> Rotas de fronteira</label>
           <label class="chk"><input type="checkbox" id="optNames" checked> Nomes dos territórios</label>
           <label class="chk"><input type="checkbox" id="optOdds" checked> Prévia de chance de vitória</label>
+          <label class="chk"><input type="checkbox" id="optUnits" checked> Unidades (I/T/N/A)</label>
+          <div class="unit-legend">
+            <span>♟ infantaria</span><span>⛨ tanque×5</span><span>⚓ navio</span><span>✈ avião</span><span>★ capital</span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="mapwrap" id="mapwrap">
+    <div class="mapwrap paper" id="mapwrap">
       <svg id="map" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
       <div class="maphint" id="maphint">Arraste · pinça para zoom · toque no território</div>
+      <div class="season-banner" id="seasonBanner"><b>Estação</b><span id="seasonTxt">—</span></div>
       <div class="zoomctl">
         <button class="btn" id="zIn">＋</button>
         <button class="btn" id="zOut">−</button>
@@ -330,8 +403,12 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
     </div>
     <div class="col right" id="colRight">
       <div class="panel">
-        <h3>Objetivo secreto <span class="tag" id="tagObjMode"></span></h3>
+        <h3>Objetivo <span class="tag" id="tagObjMode"></span></h3>
         <div class="body obj" id="objective"></div>
+      </div>
+      <div class="panel" id="panelMission">
+        <h3>Missão dinâmica <span class="tag" id="tagMission"></span></h3>
+        <div class="body" id="missionBox"></div>
       </div>
       <div class="panel">
         <h3>Cartas de território <span class="tag" id="tagCards"></span></h3>
@@ -378,18 +455,39 @@ label.chk input{accent-color:var(--brass);width:16px;height:16px}
           <select id="setObjMode">
             <option value="secreto" selected>Objetivo secreto</option>
             <option value="conquista">Conquista total — 42 territórios</option>
+            <option value="capitais">Domínio estratégico — 6 centros</option>
           </select>
+        </div>
+        <div class="field"><span>Humanos (hotseat / rede)</span>
+          <select id="setHumans"><option value="1" selected>1 humano + IAs</option><option value="2">2 humanos</option><option value="3">3 humanos</option></select>
         </div>
         <div class="field"><span>Regras opcionais</span>
           <label class="chk"><input type="checkbox" id="setPowers" checked> Cartas de estratégia e guerra moderna</label>
           <label class="chk"><input type="checkbox" id="setMin3" checked> Mínimo de 3 exércitos por rodada</label>
           <label class="chk"><input type="checkbox" id="setWarDice" checked> Regras War (defesa até 3 dados)</label>
-          <label class="chk"><input type="checkbox" id="setDefRoll" checked> Eu rolo os dados quando sou atacado</label>
+          <label class="chk"><input type="checkbox" id="setDefRoll" checked> Humanos rolam dados na defesa</label>
+          <label class="chk"><input type="checkbox" id="setSeasons" checked> Clima e estações</label>
+          <label class="chk"><input type="checkbox" id="setMissions" checked> Missões dinâmicas</label>
+          <label class="chk"><input type="checkbox" id="setCapitals" checked> Capitais por jogador + centros</label>
+        </div>
+        <div class="field"><span>Multiplayer online (WebSocket)</span>
+          <input type="text" id="setNetUrl" placeholder="ws://localhost:3080" value="ws://localhost:3080">
+          <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <button type="button" class="btn sm" id="btnNetHost">Hospedar sala</button>
+            <button type="button" class="btn sm" id="btnNetJoin">Entrar na sala</button>
+            <input type="text" id="setRoom" placeholder="código da sala" maxlength="8" style="flex:1;min-width:100px">
+          </div>
+          <div id="netSetupMsg" style="font-size:11.5px;color:var(--muted);margin-top:6px"></div>
         </div>
       </div>
     </div>
   </div>
   <footer><button class="btn primary" id="btnStart">Iniciar a guerra</button></footer>
+</div></div>
+<div class="backdrop" id="mDiplo"><div class="modal">
+  <header><h2>Diplomacia</h2><p>Alianças temporárias e comércio de cartas (entre humanos).</p></header>
+  <div class="content" id="diploBody"></div>
+  <footer><button class="btn primary" id="diploClose">Fechar</button></footer>
 </div></div>
 <div class="backdrop" id="mBattle"><div class="modal battle-modal" id="battleModal">
   <header><h2 id="battleTitle">Combate</h2><p id="battleSub"></p></header>
@@ -602,6 +700,34 @@ const POWERS = [
   {id:'domo',         ico:'⬡', n:'Domo de Ferro',      d:'Na próxima defesa, anula a primeira perda de exército do defensor.', phase:'any'},
   {id:'submarino',    ico:'▼', n:'Emboscada Naval',    d:'Próximo ataque marítimo: +1 dado de ataque (até 4, usa os 3 melhores).', phase:'ataque'}
 ];
+/* Centros estratégicos (estilo War II) */
+const STRATEGIC = {
+  novayork:     {n:'Porto de Nova York',   bonus:1},
+  california:   {n:'Costa do Pacífico',    bonus:1},
+  brasil:       {n:'Ponte Atlântica',      bonus:1},
+  inglaterra:   {n:'Quartel Europeu',      bonus:1},
+  moscou:       {n:'Fortaleza Eurasiana',  bonus:1},
+  egito:        {n:'Canal de Suez',        bonus:2},
+  orientemedio: {n:'Campos de Petróleo',   bonus:1},
+  china:        {n:'Centro Asiático',      bonus:1},
+  japao:        {n:'Porto do Pacífico',    bonus:1},
+  australia:    {n:'Base Oceânica',        bonus:1}
+};
+const SEASON_NAMES = ['primavera','verao','outono','inverno'];
+const SEASON_LABEL = {primavera:'Primavera', verao:'Verão', outono:'Outono', inverno:'Inverno'};
+/* Missões dinâmicas mid-game */
+const DYN_MISSIONS = [
+  {id:'suez', type:'hold', terr:'egito', need:3, reward:5, txt:'Segure o Canal de Suez por 3 rodadas completas.'},
+  {id:'bridge_na', type:'hold', terr:'islandia', need:2, reward:3, txt:'Mantenha a Islândia (ponte NA–EU) por 2 rodadas.'},
+  {id:'oil', type:'hold', terr:'orientemedio', need:2, reward:4, txt:'Controle os Campos de Petróleo por 2 rodadas.'},
+  {id:'take_suez', type:'conquer', terr:'egito', reward:4, txt:'Conquiste o Canal de Suez.'},
+  {id:'take_uk', type:'conquer', terr:'inglaterra', reward:3, txt:'Conquiste a Inglaterra.'},
+  {id:'take_jap', type:'conquer', terr:'japao', reward:3, txt:'Conquiste o Japão.'},
+  {id:'fleet', type:'hold', terr:'australia', need:2, reward:3, txt:'Segure a Austrália por 2 rodadas.'},
+  {id:'moscow', type:'conquer', terr:'moscou', reward:4, txt:'Conquiste Moscou.'},
+  {id:'amazon', type:'hold', terr:'brasil', need:2, reward:3, txt:'Mantenha o Brasil por 2 rodadas.'},
+  {id:'china_hold', type:'hold', terr:'china', need:2, reward:4, txt:'Segure a China por 2 rodadas.'}
+];
 const $  = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const rnd = n=>Math.floor(Math.random()*n);
@@ -661,18 +787,190 @@ const sfx={
   turn: ()=>tone(440,.1,'sine',.035)
 };
 const S = {
-  settings:{speed:'normal', sound:true, links:true, names:true, odds:true, powers:true, min3:true, warDice:true, defRoll:true, objMode:'secreto'},
+  settings:{speed:'normal', sound:true, links:true, names:true, odds:true, units:true, powers:true, min3:true, warDice:true, defRoll:true, seasons:true, missions:true, capitals:true, objMode:'secreto'},
   players:[], order:[], turn:0, round:1, phase:'reforco',
   terr:{}, deck:[], discard:[], powerDeck:[],
   epoch:0, reinf:0, placed:{}, conquered:0, mustTrade:false,
   srcUsed:new Set(), gotArmies:new Set(),
   sel:null, gameOver:false, busy:false, pickMode:null,
-  tradeCount:0, log:[], stats:[], geoData:null
+  tradeCount:0, log:[], stats:[], geoData:null,
+  season:'primavera', seasonIdx:0, alliances:[],
+  net:{ws:null, role:null, room:null, seat:0, connected:false}
 };
 function maxDefDice(){ return S.settings.warDice ? 3 : 2; }
 function isSeaLink(a,b){ return SEA.has(a+'|'+b) || SEA.has(b+'|'+a); }
+const COASTAL = (()=>{ const s=new Set(); SEA.forEach(k=>{k.split('|').forEach(x=>s.add(x));}); return s; })();
+function isStrategic(id){ return !!STRATEGIC[id]; }
+function stratBonus(p){
+  if(!S.settings.capitals) return {b:0,list:[]};
+  let b=0, list=[];
+  ownedBy(p).forEach(id=>{
+    if(STRATEGIC[id]){ b+=STRATEGIC[id].bonus; list.push(id); }
+  });
+  // capital pessoal
+  if(p.capital && S.terr[p.capital] && S.terr[p.capital].o===p.i){ b+=1; list.push(p.capital); }
+  return {b,list};
+}
+function unitBreak(n,id){
+  const art = Math.floor(n/10);
+  const cav = Math.floor((n%10)/5);
+  const inf = n % 5;
+  const ship = COASTAL.has(id) && n>=3;
+  const plane = n>=12;
+  return {art,cav,inf,ship,plane,n};
+}
+function unitGlyph(u){
+  let g='';
+  if(u.art) g += '▴'.repeat(Math.min(u.art,3));
+  if(u.cav) g += '⛨'.repeat(Math.min(u.cav,3));
+  if(u.inf) g += '·'.repeat(Math.min(u.inf,5));
+  if(u.ship) g += '⚓';
+  if(u.plane) g += '✈';
+  return g || '·';
+}
+function currentSeason(){ return S.settings.seasons ? S.season : null; }
+function climateMods(from,to){
+  // retorna {aMod, dMod, notes[]}
+  const notes=[]; let aMod=0, dMod=0;
+  if(!S.settings.seasons) return {aMod,dMod,notes};
+  const season=S.season;
+  const tc = byId[to]?.c, fc = byId[from]?.c;
+  // Inverno siberiano: Ásia e norte da Europa — defensor +1, atacante -1 se alvo em as/eu frio
+  if(season==='inverno'){
+    if(tc==='as' || to==='siberia'||to==='dudinka'||to==='omsk'||to==='alasca'||to==='mackenzie'||to==='groenlandia'||to==='suecia'||to==='moscou'){
+      dMod+=1; aMod-=1; notes.push('Inverno Siberiano: def+1 · atk−1');
+    }
+  }
+  // Monção no verão: Índia / Vietnã / China — ataque −1
+  if(season==='verao' && (to==='india'||to==='vietna'||to==='china'||to==='borneu'||to==='sumatra')){
+    aMod-=1; notes.push('Monção: ataque −1');
+  }
+  // Primavera: bônus leve de ataque em Europa
+  if(season==='primavera' && (fc==='eu'||tc==='eu')){
+    aMod+=0; // flavor only unless...
+  }
+  // Outono: tempestades marítimas — ataques marítimos −1
+  if(season==='outono' && from && to && isSeaLink(from,to)){
+    aMod-=1; notes.push('Tempestade no mar: atk −1');
+  }
+  // Verão no deserto (Argélia, Oriente Médio, Egito): defensor −0, atacante ok; logístico
+  if(season==='verao' && (to==='argelia'||to==='orientemedio'||to==='egito'||to==='sudao')){
+    notes.push('Calor do deserto');
+  }
+  return {aMod:clamp(aMod,-2,2), dMod:clamp(dMod,-2,2), notes};
+}
+function advanceSeason(){
+  if(!S.settings.seasons) return;
+  S.seasonIdx = (S.seasonIdx+1) % 4;
+  S.season = SEASON_NAMES[S.seasonIdx];
+  logSys(`Estação: <em>${SEASON_LABEL[S.season]}</em>`);
+  sfx.turn();
+}
+function alliesOf(p){
+  return S.alliances.filter(a=>a.until>=S.round && (a.a===p.i||a.b===p.i))
+    .map(a=>a.a===p.i?a.b:a.a);
+}
+function areAllied(i,j){
+  return S.alliances.some(a=>a.until>=S.round && ((a.a===i&&a.b===j)||(a.a===j&&a.b===i)));
+}
+function proposeAlliance(fromP, toP, rounds=2){
+  if(fromP.i===toP.i || !toP.alive) return false;
+  if(areAllied(fromP.i,toP.i)) return false;
+  S.alliances.push({a:fromP.i,b:toP.i,until:S.round+rounds, since:S.round});
+  logSys(`Aliança: <b style="color:${fromP.color.hex}">${fromP.name}</b> ⇄ <b style="color:${toP.color.hex}">${toP.name}</b> até rodada ${S.round+rounds}.`);
+  sfx.click();
+  return true;
+}
+function assignCapitals(){
+  if(!S.settings.capitals) return;
+  S.players.forEach(p=>{
+    const own=ownedBy(p);
+    // prefere centro estratégico
+    const pref=own.find(id=>STRATEGIC[id]) || own[0];
+    p.capital = pref;
+    if(pref) log(p, `estabeleceu capital em <em>${byId[pref].n}</em>.`);
+  });
+}
+function holdProgress(p,terrId){
+  if(!p.mission || p.mission.type!=='hold' || p.mission.terr!==terrId) return;
+  if(S.terr[terrId].o!==p.i){ p.mission.progress=0; return; }
+}
+function tickMissionsOnRound(){
+  if(!S.settings.missions) return;
+  S.players.forEach(p=>{
+    if(!p.alive || !p.mission || p.mission.done) return;
+    const m=p.mission;
+    if(m.type==='hold'){
+      if(S.terr[m.terr].o===p.i){
+        m.progress=(m.progress||0)+1;
+        if(m.progress>=m.need) completeMission(p);
+      } else m.progress=0;
+    }
+  });
+}
+function completeMission(p){
+  const m=p.mission; if(!m||m.done) return;
+  m.done=true;
+  p.pendingReinf=(p.pendingReinf||0)+(m.reward||3);
+  log(p, `completou missão dinâmica: <em>${m.txt}</em> (+${m.reward} exércitos).`);
+  sfx.conq();
+  // nova missão depois
+  p.mission = null;
+  if(S.settings.missions) assignMission(p, true);
+}
+function assignMission(p, force){
+  if(!S.settings.missions) return;
+  if(p.mission && !p.mission.done && !force) return;
+  const pool=shuffle(DYN_MISSIONS.filter(m=>{
+    // evita missão de conquistar o que já tem
+    if(m.type==='conquer' && S.terr[m.terr]?.o===p.i) return false;
+    return true;
+  }));
+  const pick=pool[0] || DYN_MISSIONS[0];
+  p.mission={...pick, progress:0, done:false, assignedRound:S.round};
+}
+function assignAllMissions(){
+  if(!S.settings.missions) return;
+  S.players.forEach(p=>{ if(p.alive) assignMission(p); });
+  logSys('Missões dinâmicas distribuídas.');
+}
+function checkMissionConquer(p, terrId){
+  if(!p.mission || p.mission.done) return;
+  if(p.mission.type==='conquer' && p.mission.terr===terrId) completeMission(p);
+}
+function seasonBannerUpdate(){
+  const el=$('#seasonBanner'), txt=$('#seasonTxt');
+  if(!el||!txt) return;
+  if(!S.settings.seasons){ el.style.display='none'; return; }
+  el.style.display='';
+  el.className='season-banner '+S.season;
+  const tips={
+    primavera:'Foco europeu. Sem modificadores extremos.',
+    verao:'Monções na Ásia SE · calor no deserto africano.',
+    outono:'Tempestades em rotas marítimas (atk −1).',
+    inverno:'Inverno Siberiano: Ásia/norte — def +1, atk −1.'
+  };
+  txt.innerHTML=`${SEASON_LABEL[S.season]} <span class="climate-chip ${S.season==='inverno'?'cold':S.season==='verao'?'hot':S.season==='outono'?'wet':''}">rodada ${S.round}</span><br>${tips[S.season]||''}`;
+}
 const cur = ()=>S.players[S.order[S.turn]];
-const me  = ()=>S.players.find(p=>!p.isAI);
+const me  = ()=>{
+  // hotseat: o humano da vez; rede: assento local
+  if(S.net.connected && S.net.seat!=null){
+    const seat=S.players.find(p=>p.seat===S.net.seat);
+    if(seat) return seat;
+  }
+  if(cur() && !cur().isAI) return cur();
+  return S.players.find(p=>!p.isAI) || S.players[0];
+};
+const isLocalHuman = p=> p && !p.isAI && (
+  !S.net.connected || p.seat===S.net.seat || (S.net.role==='host' && p.seat===0)
+);
+/** Jogador humano cujo painel (cartas/missão) está na tela — hotseat usa o da vez */
+const viewPlayer = ()=>{
+  if(S.net.connected) return S.players.find(p=>p.seat===S.net.seat) || me();
+  if(cur() && !cur().isAI) return cur();
+  return S.players.find(p=>!p.isAI) || me();
+};
 const owner = id=>S.players[S.terr[id].o];
 const armies = id=>S.terr[id].a;
 const isMine = (id,p)=>S.terr[id].o===p.i;
@@ -777,6 +1075,12 @@ function resolveRound(A,D,mods={}){
   const dEff = [...dRaw];
   if(mods.wall && dEff.length) dEff[0] = Math.min(7, dEff[0]+1);
   if(mods.naval && aKept.length) aKept[0] = Math.min(7, aKept[0]+1);
+  // clima
+  const aMod=mods.aMod||0, dMod=mods.dMod||0;
+  if(aMod && aKept.length) aKept[0] = clamp(aKept[0]+aMod, 1, 7);
+  if(dMod && dEff.length) dEff[0] = clamp(dEff[0]+dMod, 1, 7);
+  // capital: defensor em capital pessoal +1
+  if(mods.capitalDef && dEff.length) dEff[0] = Math.min(7, dEff[0]+1);
   const cmp = Math.min(aKept.length, dEff.length);
   let aLoss=0, dLoss=0; const pairs=[];
   for(let i=0;i<cmp;i++){
@@ -784,7 +1088,7 @@ function resolveRound(A,D,mods={}){
   }
   let domeSave=false;
   if(mods.dome && dLoss>0){ dLoss--; domeSave=true; }
-  return {aRaw, aKept, dRaw, dEff, aLoss, dLoss, pairs, cmp, domeSave};
+  return {aRaw, aKept, dRaw, dEff, aLoss, dLoss, pairs, cmp, domeSave, climateNotes:mods.climateNotes||[]};
 }
 function buildDeck(){
   const d = TERRS.map(t=>({t:t.id, s:t.s}));
@@ -834,31 +1138,52 @@ function assignObjectives(){
 async function newGame(cfg){
   S.epoch=(S.epoch||0)+1;
   const np = cfg.players;
-  Object.assign(S.settings,{powers:cfg.powers, min3:cfg.min3, warDice:cfg.warDice, defRoll:cfg.defRoll, objMode:cfg.objMode});
+  const nHumans = clamp(cfg.humans||1, 1, Math.min(3, np-0));
+  Object.assign(S.settings,{
+    powers:cfg.powers, min3:cfg.min3, warDice:cfg.warDice, defRoll:cfg.defRoll,
+    seasons:cfg.seasons!==false, missions:cfg.missions!==false, capitals:cfg.capitals!==false,
+    objMode:cfg.objMode
+  });
   _win.clear();
+  document.body.classList.add('board-paper');
   const otherColors = shuffle(COLORS.filter(c=>c.id!==cfg.colorId));
   const names = shuffle([...AI_NAMES]);
-  const personas = personaPool(np-1);
-  const levels = levelPool(np-1, 'padrao');
+  const nAI = np - nHumans;
+  const personas = personaPool(Math.max(0,nAI));
+  const levels = levelPool(Math.max(0,nAI), 'padrao');
   S.players = [];
-  S.players.push({i:0, name:cfg.name||'Comandante', color:COLORS.find(c=>c.id===cfg.colorId),
-    isAI:false, cards:[], powers:[], alive:true, obj:null, eff:{}, kills:0, conq:0, lost:0, battles:0});
-  for(let k=0;k<np-1;k++){
-    S.players.push({i:k+1, name:names[k], color:otherColors[k], isAI:true,
-      persona:personas[k], level:levels[k], cards:[], powers:[], alive:true, obj:null, eff:{}, kills:0, conq:0, lost:0, battles:0});
+  const humanNames = [cfg.name||'Comandante', 'Oficial 2', 'Oficial 3'];
+  for(let h=0;h<nHumans;h++){
+    const col = h===0 ? COLORS.find(c=>c.id===cfg.colorId) : otherColors[h-1];
+    S.players.push({i:h, name:humanNames[h]+(h?` (${col.n})`:''), color:col,
+      isAI:false, seat:h, cards:[], powers:[], alive:true, obj:null, eff:{}, kills:0, conq:0, lost:0, battles:0, capital:null, mission:null});
   }
+  for(let k=0;k<nAI;k++){
+    const colorIdx = nHumans-1+k;
+    S.players.push({i:nHumans+k, name:names[k], color:otherColors[colorIdx], isAI:true, seat:null,
+      persona:personas[k], level:levels[k], cards:[], powers:[], alive:true, obj:null, eff:{}, kills:0, conq:0, lost:0, battles:0, capital:null, mission:null});
+  }
+  // reindex
+  S.players.forEach((p,i)=>p.i=i);
   S.terr={}; distributeTerritories(np);
   S.deck = buildDeck(); S.discard=[]; S.powerDeck = shuffle(POWERS.map(p=>p.id).concat(POWERS.map(p=>p.id)));
   S.tradeCount=0; S.round=1; S.gameOver=false; S.log=[]; S.stats=[];
+  S.alliances=[]; S.seasonIdx=0; S.season='primavera';
   S.order = shuffle(S.players.map(p=>p.i));
   S.turn = 0;
   if(S.settings.objMode==='secreto') assignObjectives();
+  else if(S.settings.objMode==='capitais') S.players.forEach(p=>p.obj={id:'cap',type:'capitais',need:6,txt:'Controle 6 centros estratégicos ao mesmo tempo.'});
   else S.players.forEach(p=>p.obj={id:'total',type:'total',txt:'Conquistar todos os 42 territórios.'});
-  logSys('A guerra começa. '+np+' exércitos, 42 territórios.');
+  assignCapitals();
+  assignAllMissions();
+  logSys('A guerra começa. '+np+' exércitos ('+nHumans+' humano'+(nHumans>1?'s':'')+'), 42 territórios.');
+  if(S.settings.seasons) logSys('Clima ativo — estação inicial: <em>Primavera</em>.');
+  if(S.settings.capitals) logSys('Centros estratégicos e capitais em jogo.');
   logSys('Ordem: '+S.order.map(i=>S.players[i].name).join(' → '));
   setHint('Carregando mapa…');
   await buildMap();
   render();
+  netBroadcastState();
   startTurn();
 }
 function baseReinf(p){
@@ -872,12 +1197,20 @@ function contBonus(p){
   Object.keys(CONTS).forEach(c=>{ if(contOwned(p,c)){ b+=CONTS[c].bonus; list.push(c); } });
   return {b, list};
 }
-function computeReinf(p){ const {b}=contBonus(p); return baseReinf(p)+b; }
+function computeReinf(p){
+  const {b}=contBonus(p);
+  const s=stratBonus(p);
+  return baseReinf(p)+b+s.b;
+}
 function objectiveDone(p){
   const o=p.obj; if(!o) return false;
   const owned = ownedBy(p);
   if(owned.length===42) return true;
   if(o.type==='total') return owned.length===42;
+  if(o.type==='capitais'){
+    const n = owned.filter(id=>isStrategic(id)).length;
+    return n >= (o.need||6);
+  }
   if(o.type==='cont'){
     if(!o.conts.every(c=>contOwned(p,c))) return false;
     if(!o.extra) return true;
@@ -899,6 +1232,10 @@ function objectiveDone(p){
 }
 function objectiveText(p){
   const o=p.obj; if(!o) return '';
+  if(o.type==='capitais'){
+    const n = ownedBy(p).filter(id=>isStrategic(id)).length;
+    return `${o.txt} <span style="color:var(--brass)">(${n}/${o.need||6})</span>`;
+  }
   if(o.type!=='destroy') return o.txt;
   const tgt = S.players.find(x=>x.color.id===o.color);
   if(!tgt || tgt.i===p.i) return 'Conquistar 24 territórios. (alvo não está em jogo)';
@@ -1239,7 +1576,7 @@ function hoverTerr(e){
   const id=g.dataset.id, t=byId[id], st=S.terr[id], p=S.players[st.o];
   const wrap=$('#mapwrap').getBoundingClientRect();
   let extra='';
-  if(S.settings.odds && S.sel && S.phase==='ataque' && ADJ[S.sel].includes(id) && st.o!==cur().i && cur()===me()){
+  if(S.settings.odds && S.sel && S.phase==='ataque' && ADJ[S.sel].includes(id) && st.o!==cur().i && isLocalHuman(cur())){
     const pc=pConquer(armies(S.sel), st.a);
     extra = `<div class="r"><span>Chance de tomar</span><i>${(pc*100).toFixed(0)}%</i></div>`;
   }
@@ -1279,6 +1616,29 @@ function render(){
       txt.setAttribute('fill', own.color.id==='branco'||own.color.id==='amarelo' ? '#f2efe6' : '#f4f1e6');
       txt.textContent = st.a;
     }
+    // unidades + capital star
+    let ug = g.querySelector('.unit-row');
+    if(S.settings.units){
+      if(!ug){
+        const [cx,cy]=t.k||[0,0];
+        ug=mk('text',{class:'unit-row',x:String(cx),y:String(cy+22)});
+        g.querySelector('.badge')?.appendChild(ug) || g.appendChild(ug);
+      }
+      const u=unitBreak(st.a,t.id);
+      ug.textContent = unitGlyph(u);
+      ug.style.display='';
+    } else if(ug) ug.style.display='none';
+    let star=g.querySelector('.cap-star');
+    const isCap = (own.capital===t.id) || isStrategic(t.id);
+    if(isCap){
+      if(!star){
+        const [cx,cy]=t.k||[0,0];
+        star=mk('polygon',{class:'cap-star', points: capStarPoints(cx, cy-20, 7)});
+        g.appendChild(star);
+      }
+      star.setAttribute('opacity', own.capital===t.id ? '1' : (isStrategic(t.id)?'0.75':'0'));
+    } else if(star) star.remove();
+    g.classList.toggle('capital', own.capital===t.id);
     const tn = g.querySelector('.tn');
     if (tn) tn.style.display = S.settings.names ? '' : 'none';
     g.classList.remove('sel','tgt','dim','pulse','under-fire');
@@ -1336,10 +1696,49 @@ function render(){
     }
   }
   $('#curDot').style.background=p.color.hex; $('#curDot').style.color=p.color.hex;
-  $('#curName').textContent = p.isAI ? p.name : p.name+' (você)';
+  $('#curName').textContent = p.isAI ? p.name : (isLocalHuman(p)? p.name+' (você)' : p.name+' (humano)');
   $('#roundLbl').textContent='Rodada '+S.round;
   $$('.phase').forEach(e=>e.classList.toggle('active', e.dataset.p===S.phase && !S.gameOver));
+  seasonBannerUpdate();
   renderPlayers(); renderConts(); renderObjective(); renderHand(); renderPowers(); renderActions();
+  renderStrat(); renderMission();
+}
+function capStarPoints(cx,cy,r){
+  const pts=[];
+  for(let i=0;i<5;i++){
+    const a=-Math.PI/2+i*2*Math.PI/5;
+    const b=a+Math.PI/5;
+    pts.push((cx+Math.cos(a)*r)+','+(cy+Math.sin(a)*r));
+    pts.push((cx+Math.cos(b)*r*0.4)+','+(cy+Math.sin(b)*r*0.4));
+  }
+  return pts.join(' ');
+}
+function renderStrat(){
+  const box=$('#stratList'); if(!box) return;
+  const mine=viewPlayer();
+  let held=0;
+  box.innerHTML=Object.keys(STRATEGIC).map(id=>{
+    const st=S.terr[id]; if(!st) return '';
+    const own=S.players[st.o];
+    const mineIt=own===mine;
+    if(mineIt) held++;
+    const s=STRATEGIC[id];
+    return `<div class="crow${mineIt?' complete':''}"><i class="swatch" style="background:${own.color.hex}"></i><span class="nm">${s.n} <small style="color:var(--muted)">(${byId[id].n})</small></span><span class="bonus">+${s.bonus}</span></div>`;
+  }).join('');
+  $('#tagStrat').textContent = held+'/'+Object.keys(STRATEGIC).length;
+}
+function renderMission(){
+  const box=$('#missionBox'), panel=$('#panelMission');
+  if(!box||!panel) return;
+  if(!S.settings.missions){ panel.style.display='none'; return; }
+  panel.style.display='';
+  const p=viewPlayer();
+  if(!p||!p.mission){ box.innerHTML='<div style="font-size:12px;color:var(--muted)">Nenhuma missão ativa.</div>'; $('#tagMission').textContent='—'; return; }
+  const m=p.mission;
+  const prog = m.type==='hold' ? `${m.progress||0}/${m.need}` : (m.done?'feita':'pendente');
+  const own = S.terr[m.terr] ? S.players[S.terr[m.terr].o] : null;
+  box.innerHTML=`<div class="mission-card"><div class="mh">${m.type==='hold'?'Segurar':'Conquistar'} · ${byId[m.terr]?.n||m.terr}</div><div class="md">${m.txt}</div><div class="mp">Progresso: ${prog} · recompensa +${m.reward} exércitos${own?` · controlado por <span style="color:${own.color.hex}">${own.name}</span>`:''}</div></div>`;
+  $('#tagMission').textContent = m.done?'ok':prog;
 }
 function renderPlayers(){
   const box=$('#players'); box.innerHTML='';
@@ -1369,14 +1768,18 @@ function renderConts(){
   });
 }
 function renderObjective(){
-  $('#tagObjMode').textContent = S.settings.objMode==='secreto'?'sigiloso':'conquista total';
-  const p=me();
+  const mode = S.settings.objMode==='secreto'?'sigiloso':S.settings.objMode==='capitais'?'estratégico':'conquista total';
+  $('#tagObjMode').textContent = mode;
+  const p=viewPlayer();
+  if(!p){ $('#objective').innerHTML=''; return; }
   let html = `<div>${objectiveText(p)}</div>`;
+  if(p.capital) html += `<div style="margin-top:8px;font-size:12px;color:var(--muted)">Capital: <b style="color:${p.color.hex}">${byId[p.capital]?.n||'—'}</b></div>`;
   if(p.revealed) html += `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(148,170,200,.16)"><div style="font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Inteligência</div>${Object.entries(p.revealed).map(([i,txt])=>`<div style="margin:4px 0"><b style="color:${S.players[i].color.hex}">${S.players[i].name}</b>: ${txt}</div>`).join('')}</div>`;
   $('#objective').innerHTML=html;
 }
 function renderHand(){
-  const p=me(), box=$('#hand'); box.innerHTML='';
+  const p=viewPlayer(), box=$('#hand'); box.innerHTML='';
+  if(!p) return;
   $('#tagCards').textContent=p.cards.length+'/5';
   p.cards.forEach((c,i)=>{
     const owned = c.t && S.terr[c.t].o===p.i;
@@ -1395,11 +1798,13 @@ function renderHand(){
 function renderPowers(){
   $('#panelPowers').style.display = S.settings.powers ? '' : 'none';
   if(!S.settings.powers) return;
-  const p=me(), box=$('#powers'); box.innerHTML='';
+  const p=viewPlayer(), box=$('#powers'); box.innerHTML='';
+  if(!p) return;
   $('#tagPowers').textContent=p.powers.length+'/3';
   if(!p.powers.length){ box.innerHTML='<div style="font-size:12px;color:var(--muted);line-height:1.5">Conquiste 2+ territórios para receber carta de estratégia.</div>'; return; }
   p.powers.forEach((pid,i)=>{
     const pw=POWERS.find(x=>x.id===pid);
+    if(!pw) return;
     const usable = cur()===p && !S.busy && !S.gameOver && (pw.phase==='any' || pw.phase===S.phase);
     const d=document.createElement('div'); d.className='power';
     d.innerHTML=`<div class="ico">${pw.ico}</div><div style="flex:1"><div class="t">${pw.n}</div><div class="d">${pw.d}</div></div>`;
@@ -1416,10 +1821,12 @@ function setHint(h){ $('#hint').innerHTML=h; }
 function renderActions(){
   const box=$('#actions'); box.innerHTML='';
   const p=cur();
-  $('#reinfBox').hidden = !(p===me() && S.phase==='reforco' && !S.gameOver);
+  const local = isLocalHuman(p);
+  $('#reinfBox').hidden = !(local && S.phase==='reforco' && !S.gameOver);
   $('#reinfN').textContent=S.reinf;
   if(S.gameOver){ setHint('A guerra terminou.'); return; }
   if(p.isAI){ setHint(`<b>${p.name}</b> está deliberando…`); return; }
+  if(!local){ setHint(`Turno de <b style="color:${p.color.hex}">${p.name}</b> (outro humano / rede).`); return; }
   if(S.busy) return;
   const add=(txt,cls,fn,dis)=>{const b=document.createElement('button');b.className='btn '+cls;b.textContent=txt;b.disabled=!!dis;b.onclick=fn;box.appendChild(b);return b;};
   if(S.phase==='reforco'){
@@ -1457,7 +1864,7 @@ function onTerrClick(id){
     return;
   }
   if(S.busy) return;
-  const p=cur(); if(p.isAI) return;
+  const p=cur(); if(p.isAI || !isLocalHuman(p)) return;
   const st=S.terr[id];
   
   if(S.phase==='reforco'){
@@ -1499,6 +1906,10 @@ function onTerrClick(id){
     if(ADJ[S.sel].includes(id)){
       if(p.eff.cannotAttack===st.o){
         setHint('Trégua em vigor: você não pode atacar '+S.players[st.o].name+' neste turno.');
+        return;
+      }
+      if(areAllied(p.i, st.o)){
+        setHint('Aliança ativa: não pode atacar <b>'+S.players[st.o].name+'</b>.');
         return;
       }
       openBattle(S.sel,id);
@@ -1543,9 +1954,10 @@ function autoPlace(){
   sfx.place(); render();
 }
 $('#btnTrade').onclick=()=>{
-  const p=me(); const sel=p.cards.filter(c=>c._sel);
+  const p=viewPlayer(); if(!p||cur()!==p) return;
+  const sel=p.cards.filter(c=>c._sel);
   if(sel.length!==3||!isSet(sel)) return;
-  doTrade(p,sel); render();
+  doTrade(p,sel); render(); netBroadcastState();
 };
 function doTrade(p,set){
   S.tradeCount++;
@@ -1582,13 +1994,19 @@ function dieEl(v,def){
 }
 function battleMods(a,d,from,to){
   const sea = from&&to ? isSeaLink(from,to) : false;
+  const clim = climateMods(from,to);
+  const capitalDef = d.capital===to && S.terr[to]?.o===d.i;
   return {
     extraDie: !!(a.eff.artilharia || (a.eff.submarino && sea)),
     wall: !!d.eff.wall,
     naval: !!(a.eff.naval && sea),
     dome: !!d.eff.dome,
     submarino: !!(a.eff.submarino && sea),
-    sea
+    sea,
+    aMod: clim.aMod,
+    dMod: clim.dMod + (capitalDef?0:0),
+    capitalDef,
+    climateNotes: clim.notes.concat(capitalDef?['Defesa da capital +1']:[])
   };
 }
 function closeBattle(opts={}){
@@ -1692,6 +2110,8 @@ function drawBattle(rolls){
   if(mods.naval) note.push('frota naval (+1 atk)');
   if(mods.dome) note.push('domo de ferro ativo');
   if(mods.sea) note.push('rota marítima');
+  if(mods.capitalDef) note.push('capital defendida');
+  if(mods.climateNotes?.length) note.push(...mods.climateNotes);
   const modeTxt = B.role==='defend'
     ? `<span style="color:var(--alert)">Defesa ativa</span> — role para contestar o ataque`
     : `<b style="color:${a.color.hex}">${a.name}</b> ataca <b style="color:${d.color.hex}">${d.name}</b>`;
@@ -1770,15 +2190,23 @@ async function conquer(from,to,a,d,r){
   S.terr[to].o = a.i; S.terr[to].a = 0;
   S.conquered++; a.conq++;
   log(a, `conquistou <em>${byId[to].n}</em> de ${d.name}.`);
+  // capital capturada
+  if(d.capital===to){
+    log(a, `tomou a capital de <em>${d.name}</em>!`);
+    a.pendingReinf=(a.pendingReinf||0)+2;
+    d.capital = ownedBy(d).find(x=>x!==to) || null;
+  }
+  if(a.capital===to || !a.capital) a.capital=to;
+  checkMissionConquer(a, to);
   let n;
   const res = B && B.resolve;
-  if(a===me()){
+  if(!a.isAI && isLocalHuman(a)){
     $('#mBattle').classList.remove('on');
     await sleep(140);
     n = maxMove>minMove ? await askMoveP('Ocupar território', `De ${byId[from].n} para ${byId[to].n}`, minMove, maxMove) : minMove;
   } else {
     n = clamp(Math.round((armies(from)-1)*.72), minMove, maxMove);
-    if(d===me()) sfx.lost();
+    if(!d.isAI && isLocalHuman(d)) sfx.lost();
   }
   applyConquest(from,to,a,d,n);
   $('#mBattle').classList.remove('on');
@@ -1962,12 +2390,17 @@ function beginTurn(p){
   S.srcUsed=new Set(); S.gotArmies=new Set(); S.pickMode=null;
   p.eff.wall=false; p.eff.blitz=false; p.eff.artilharia=false;
   p.eff.naval=false; p.eff.submarino=false;
-  // dome e trégua: dome persiste até usado; trégua is on target
   S.reinf = computeReinf(p) + (p.pendingReinf||0); p.pendingReinf=0;
-  S.mustTrade = !p.isAI && p.cards.length>=5;
+  S.mustTrade = !p.isAI && isLocalHuman(p) && p.cards.length>=5;
   sfx.turn();
   const {b,list}=contBonus(p);
-  logSys(`— turno de <b style="color:${p.color.hex}">${p.name}</b> · ${S.reinf} exércitos`+(b?` <span style="color:var(--brass)">(+${b} de ${list.map(c=>CONTS[c].n).join(', ')})</span>`:'')+' —');
+  const sb=stratBonus(p);
+  let extra='';
+  if(b) extra+=` <span style="color:var(--brass)">(+${b} cont.)</span>`;
+  if(sb.b) extra+=` <span style="color:var(--verdigris)">(+${sb.b} estratégicos)</span>`;
+  logSys(`— turno de <b style="color:${p.color.hex}">${p.name}</b> · ${S.reinf} exércitos${extra} —`);
+  if(S.settings.seasons) seasonBannerUpdate();
+  netBroadcastState();
 }
 async function runTurn(){
   if(S.gameOver) return;
@@ -1976,6 +2409,11 @@ async function runTurn(){
   if(!p.alive){ advance(); return; }
   beginTurn(p);
   render();
+  // rede: só o dono do assento joga localmente
+  if(S.net.connected && !p.isAI && p.seat!==S.net.seat && S.net.role!=='host'){
+    setHint(`Aguardando <b>${p.name}</b> na rede…`);
+    return;
+  }
   if(p.isAI){
     S.busy=true; render();
     await aiTurn(p);
@@ -1983,6 +2421,9 @@ async function runTurn(){
     S.busy=false;
     if(S.gameOver){ render(); return; }
     concludeTurn();
+  } else if(!isLocalHuman(p) && S.players.filter(x=>!x.isAI).length>1 && !S.net.connected){
+    // hotseat: passa o controle — o próximo humano joga no mesmo PC
+    setHint(`Hotseat: entregue o aparelho a <b style="color:${p.color.hex}">${p.name}</b>.`);
   }
 }
 function startTurn(){ runTurn(); }
@@ -1993,9 +2434,18 @@ function advance(){
     S.turn=(S.turn+1)%S.order.length;
     if(S.turn===0){
       S.round++;
+      advanceSeason();
+      tickMissionsOnRound();
+      // limpa alianças expiradas
+      S.alliances = S.alliances.filter(a=>a.until>=S.round);
       if(S.round>120){ endGame(S.players.filter(p=>p.alive).sort((a,b)=>ownedBy(b).length-ownedBy(a).length)[0], 'Armistício.'); return; }
+      // novas missões a cada 5 rodadas para quem não tem
+      if(S.settings.missions && S.round%5===0){
+        S.players.forEach(p=>{ if(p.alive && (!p.mission || p.mission.done)) assignMission(p,true); });
+      }
     }
   } while(!cur().alive && ++guard<20);
+  netBroadcastState();
   runTurn();
 }
 function concludeTurn(){
@@ -2078,6 +2528,7 @@ async function aiAttack(p,K,L){
       enemiesOf(from,p).forEach(to=>{
         const dOwner=S.players[S.terr[to].o];
         if(p.eff.cannotAttack===dOwner.i) return;
+        if(areAllied(p.i, dOwner.i)) return;
         const A=armies(from), D=armies(to), pc=pConquer(A,D), t=byId[to];
         let val=1;
         val += objWeightTerr(p,to)*1.5*K.objW;
@@ -2114,10 +2565,10 @@ async function aiAttack(p,K,L){
 }
 async function aiBattle(p,from,to,L){
   const d=S.players[S.terr[to].o];
-  // Humano defende rolando os dados (quando a opção está ativa)
-  if(!d.isAI && S.settings.defRoll){
+  // Humano local defende rolando os dados
+  if(!d.isAI && S.settings.defRoll && isLocalHuman(d)){
     await openDefendBattle(from,to,p,d,L);
-    S.busy=true; // retoma o turno da IA
+    S.busy=true;
     return;
   }
   let guard=0;
@@ -2133,11 +2584,13 @@ async function aiBattle(p,from,to,L){
     flash(to); sfx.dice();
     if(armies(to)<=0){
       const maxMove=Math.min(3,armies(from)-1);
-      const minMove=clamp(Math.min(3,r.aKept.length),1,maxMove);
       const n = maxMove;
       S.terr[to].o=p.i; S.terr[to].a=0;
       S.conquered++; p.conq++;
       log(p,`conquistou <em>${byId[to].n}</em> de ${d.name}.`);
+      if(d.capital===to){ log(p,`tomou a capital de <em>${d.name}</em>!`); p.pendingReinf=(p.pendingReinf||0)+2; d.capital=ownedBy(d)[0]||null; }
+      if(!p.capital) p.capital=to;
+      checkMissionConquer(p,to);
       applyConquest(from,to,p,d,n);
       ripple(to,p.color.hex); sfx.conq(); render();
       checkVictory();
@@ -2288,6 +2741,7 @@ function syncOptionInputs(){
   $('#optLinks').checked=S.settings.links;
   $('#optNames').checked=S.settings.names;
   $('#optOdds').checked=S.settings.odds;
+  if($('#optUnits')) $('#optUnits').checked=S.settings.units!==false;
   $('#selSpeed').value=S.settings.speed;
   $('#btnSound').textContent=S.settings.sound?'🔊':'🔇';
 }
@@ -2303,13 +2757,17 @@ $('#btnStart').onclick=async()=>{
     $('#mSetup').classList.remove('on');
     await newGame({
       players:+$('#setPlayers').value,
+      humans:+$('#setHumans').value,
       colorId:pickedColor,
       name:$('#setName').value.trim()||'Comandante',
       objMode:$('#setObjMode').value,
       powers:$('#setPowers').checked,
       min3:$('#setMin3').checked,
       warDice:$('#setWarDice').checked,
-      defRoll:$('#setDefRoll').checked
+      defRoll:$('#setDefRoll').checked,
+      seasons:$('#setSeasons').checked,
+      missions:$('#setMissions').checked,
+      capitals:$('#setCapitals').checked
     });
   }catch(e){
     console.error('Erro ao iniciar:', e);
@@ -2343,6 +2801,16 @@ $('#btnRules').onclick=()=>{
   $('#rulesBody').innerHTML=`
     <h4 style="color:var(--brass);margin:0 0 8px">Combate (regras War)</h4>
     <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Atacante rola até <b style="color:var(--bone)">3 dados</b> (exércitos − 1). Defensor até <b style="color:var(--bone)">${md} dados</b>${S.settings.warDice?' (oficial Grow)':' (estilo Risk)'}. Compara-se o maior com o maior; <b style="color:var(--bone)">empate favorece a defesa</b>. Quando você é atacado, o painel de combate abre para você rolar os dados amarelos.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Centros estratégicos & capitais</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">10 centros dão reforços extras. Cada jogador tem uma capital (★) com defesa +1. Tomar capital inimiga concede +2 exércitos. Vitória <b style="color:var(--bone)">Domínio estratégico</b>: controle 6 centros.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Unidades no mapa</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Visual clássico: · infantaria · ⛨ tanque (5) · ▴ artilharia (10) · ⚓ costa · ✈ força aérea (12+). A matemática continua em exércitos totais.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Clima</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada rodada completa a estação muda: <b style="color:var(--bone)">inverno siberiano</b>, monções no verão, tempestades no outono em rotas marítimas.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Missões dinâmicas</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Objetivos mid-game (segurar Suez, conquistar Japão…). Completar concede reforços bônus.</p>
+    <h4 style="color:var(--brass);margin:0 0 8px">Diplomacia & multiplayer</h4>
+    <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">Alianças temporárias e troca de cartas entre humanos. Hotseat no mesmo aparelho ou WebSocket (<code style="color:var(--bone)">node server.mjs</code>).</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Reforços</h4>
     <p style="margin:0 0 12px;line-height:1.55;font-size:13px;color:var(--muted)">A cada turno: metade dos territórios (mín. 3 se a opção estiver ativa) + bônus de continentes dominados (NA 5 · EU 5 · Ásia 7 · África 3 · SA/OC 2).</p>
     <h4 style="color:var(--brass);margin:0 0 8px">Cartas de território</h4>
@@ -2368,6 +2836,135 @@ $('#selSpeed').onchange=e=>S.settings.speed=e.target.value;
 $('#optLinks').onchange=e=>{S.settings.links=e.target.checked;render();};
 $('#optNames').onchange=e=>{S.settings.names=e.target.checked;render();};
 $('#optOdds').onchange=e=>{S.settings.odds=e.target.checked;};
+$('#optUnits').onchange=e=>{S.settings.units=e.target.checked;render();};
+function openDiplo(){
+  const p=cur();
+  if(!p || p.isAI || !isLocalHuman(p)){ setHint('Diplomacia só no seu turno.'); return; }
+  const humans=S.players.filter(x=>x.alive && x.i!==p.i);
+  let html=`<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Alianças impedem ataque mútuo até a rodada indicada. Comércio de cartas só entre humanos.</div>`;
+  html+=`<h4 style="color:var(--brass);margin:0 0 8px;font-size:12px">Alianças ativas</h4>`;
+  const active=S.alliances.filter(a=>a.until>=S.round);
+  if(!active.length) html+=`<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Nenhuma.</div>`;
+  else active.forEach(a=>{
+    html+=`<div class="alliance-row"><span style="color:${S.players[a.a].color.hex}">${S.players[a.a].name}</span> ⇄ <span style="color:${S.players[a.b].color.hex}">${S.players[a.b].name}</span> <span style="color:var(--muted)">até rod. ${a.until}</span></div>`;
+  });
+  html+=`<h4 style="color:var(--brass);margin:12px 0 8px;font-size:12px">Propor aliança (2 rodadas)</h4>`;
+  humans.forEach(h=>{
+    const al=areAllied(p.i,h.i);
+    html+=`<div class="alliance-row"><span style="color:${h.color.hex}">${h.name}</span>${h.isAI?' <small style="color:var(--muted)">IA</small>':''}
+      <button class="btn sm primary" data-ally="${h.i}" ${al?'disabled':''}>${al?'Aliado':'Aliar-se'}</button></div>`;
+  });
+  html+=`<h4 style="color:var(--brass);margin:12px 0 8px;font-size:12px">Comércio de cartas</h4>`;
+  const tradeTargets=humans.filter(h=>!h.isAI);
+  if(!tradeTargets.length || !p.cards.length){
+    html+=`<div style="font-size:12px;color:var(--muted)">Precisa de cartas e outro humano na partida (hotseat/rede).</div>`;
+  } else {
+    html+=`<div style="font-size:12px;color:var(--muted);margin-bottom:8px">Oferece 1 carta aleatória da sua mão a um aliado ou qualquer humano.</div>`;
+    tradeTargets.forEach(h=>{
+      html+=`<div class="alliance-row"><span style="color:${h.color.hex}">${h.name}</span>
+        <button class="btn sm" data-gift="${h.i}" ${p.cards.length? '':'disabled'}>Dar 1 carta</button></div>`;
+    });
+  }
+  $('#diploBody').innerHTML=html;
+  $('#diploBody').querySelectorAll('[data-ally]').forEach(btn=>{
+    btn.onclick=()=>{
+      const t=S.players[+btn.dataset.ally];
+      if(proposeAlliance(p,t,2)){ openDiplo(); render(); netBroadcastState(); }
+    };
+  });
+  $('#diploBody').querySelectorAll('[data-gift]').forEach(btn=>{
+    btn.onclick=()=>{
+      const t=S.players[+btn.dataset.gift];
+      if(!p.cards.length) return;
+      const card=p.cards.pop();
+      t.cards.push(card);
+      log(p, `enviou uma carta de território a <em>${t.name}</em>.`);
+      sfx.click(); openDiplo(); render(); netBroadcastState();
+    };
+  });
+  $('#mDiplo').classList.add('on');
+}
+$('#btnDiplomacy').onclick=()=>{ openDiplo(); sfx.click(); };
+$('#diploClose').onclick=()=>$('#mDiplo').classList.remove('on');
+
+/* ——— Multiplayer WebSocket (opcional) ——— */
+function netSetStatus(msg, cls){
+  const el=$('#netStatus'); if(!el) return;
+  el.className=cls||'';
+  el.textContent=msg;
+  $('#netBar').classList.add('on');
+}
+function netBroadcastState(){
+  if(!S.net.ws || S.net.ws.readyState!==1 || S.net.role!=='host') return;
+  try{
+    const payload={
+      type:'state',
+      room:S.net.room,
+      state:{
+        players:S.players.map(p=>({i:p.i,name:p.name,colorId:p.color.id,isAI:p.isAI,seat:p.seat,cards:p.cards,powers:p.powers,alive:p.alive,obj:p.obj,eff:p.eff,kills:p.kills,conq:p.conq,lost:p.lost,battles:p.battles,capital:p.capital,mission:p.mission,killedBy:p.killedBy,pendingReinf:p.pendingReinf,revealed:p.revealed})),
+        order:S.order, turn:S.turn, round:S.round, phase:S.phase,
+        terr:S.terr, reinf:S.reinf, conquered:S.conquered, tradeCount:S.tradeCount,
+        settings:S.settings, season:S.season, seasonIdx:S.seasonIdx,
+        alliances:S.alliances, gameOver:S.gameOver, log:S.log.slice(0,40),
+        deckLen:S.deck.length, discardLen:S.discard.length
+      }
+    };
+    S.net.ws.send(JSON.stringify(payload));
+  }catch(e){ console.warn('net send', e); }
+}
+function netApplyState(st){
+  if(!st) return;
+  S.players = st.players.map(p=>({
+    ...p,
+    color: COLORS.find(c=>c.id===p.colorId) || COLORS[0],
+    cards: p.cards||[], powers:p.powers||[], eff:p.eff||{}
+  }));
+  S.order=st.order; S.turn=st.turn; S.round=st.round; S.phase=st.phase;
+  S.terr=st.terr; S.reinf=st.reinf; S.conquered=st.conquered; S.tradeCount=st.tradeCount;
+  Object.assign(S.settings, st.settings||{});
+  S.season=st.season; S.seasonIdx=st.seasonIdx;
+  S.alliances=st.alliances||[]; S.gameOver=st.gameOver;
+  if(st.log) S.log=st.log;
+  render();
+}
+function netConnect(url, role){
+  return new Promise((resolve,reject)=>{
+    try{
+      if(S.net.ws){ try{S.net.ws.close();}catch(e){} }
+      const ws=new WebSocket(url);
+      S.net.ws=ws; S.net.role=role;
+      ws.onopen=()=>{ S.net.connected=true; netSetStatus('Conectado · '+role,'ok'); resolve(ws); };
+      ws.onerror=()=>{ netSetStatus('Falha na conexão','warn'); reject(new Error('ws')); };
+      ws.onclose=()=>{ S.net.connected=false; netSetStatus('Desconectado','warn'); };
+      ws.onmessage=(ev)=>{
+        let msg; try{ msg=JSON.parse(ev.data); }catch(e){ return; }
+        if(msg.type==='joined'){ S.net.room=msg.room; S.net.seat=msg.seat; $('#netRoom').textContent='Sala '+msg.room+' · assento '+msg.seat; }
+        if(msg.type==='state' && role==='client') netApplyState(msg.state);
+        if(msg.type==='error'){ $('#netSetupMsg').textContent=msg.error||'Erro de rede'; netSetStatus(msg.error,'warn'); }
+        if(msg.type==='room'){ S.net.room=msg.room; $('#netRoom').textContent='Sala '+msg.room; $('#setRoom').value=msg.room; }
+      };
+    }catch(e){ reject(e); }
+  });
+}
+$('#btnNetHost').onclick=async()=>{
+  const url=$('#setNetUrl').value.trim()||'ws://localhost:3080';
+  try{
+    await netConnect(url,'host');
+    S.net.ws.send(JSON.stringify({type:'host', room:$('#setRoom').value.trim()||undefined}));
+    $('#netSetupMsg').textContent='Hospedando. Peça aos outros para entrar com o código da sala. Rode: node server.mjs';
+    netSetStatus('Host online','ok');
+  }catch(e){ $('#netSetupMsg').textContent='Não conectou. Inicie o servidor: node server.mjs'; }
+};
+$('#btnNetJoin').onclick=async()=>{
+  const url=$('#setNetUrl').value.trim()||'ws://localhost:3080';
+  const room=$('#setRoom').value.trim();
+  if(!room){ $('#netSetupMsg').textContent='Informe o código da sala.'; return; }
+  try{
+    await netConnect(url,'client');
+    S.net.ws.send(JSON.stringify({type:'join', room}));
+    $('#netSetupMsg').textContent='Entrando na sala '+room+'…';
+  }catch(e){ $('#netSetupMsg').textContent='Falha ao entrar. Servidor rodando?'; }
+};
 $$('.tabs .btn').forEach(b=>b.onclick=()=>{
   const t=b.dataset.tab;
   $$('.tabs .btn').forEach(x=>x.classList.toggle('primary', x===b));
@@ -2382,6 +2979,7 @@ document.addEventListener('keydown',e=>{
       if(B && B.role==='defend') return; // defensor não fecha à força
       $('#btnRetreat').click(); return;
     }
+    if($('#mDiplo')?.classList.contains('on')){ $('#mDiplo').classList.remove('on'); return; }
     if($('#mStats').classList.contains('on')){ $('#mStats').classList.remove('on'); return; }
     if($('#mRules').classList.contains('on')){ $('#mRules').classList.remove('on'); return; }
     if(S.sel){ S.sel=null; render(); }

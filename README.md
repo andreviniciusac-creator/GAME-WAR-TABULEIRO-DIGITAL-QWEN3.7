@@ -1,88 +1,80 @@
 # WAR — Estratégia e Conquista
 
-Simulação digital do clássico jogo de tabuleiro **WAR** (Grow), em **HTML5 + CSS3 + JavaScript puro** (sem dependências de build).
+Simulação digital do clássico **WAR** (Grow) em **HTML5 + CSS3 + JavaScript puro**, com expansão de nível:
 
-Um único arquivo responsivo serve **desktop, tablet e iPad/iPhone**:
+- Capitais e centros estratégicos  
+- Unidades no mapa (infantaria / tanque / navio / avião)  
+- Clima e estações  
+- Missões dinâmicas  
+- Diplomacia (alianças e cartas)  
+- Hotseat multi-humano + multiplayer **WebSocket**  
+- Visual de tabuleiro (papel, dados 3D leves)
+
+Arquivo principal:
 
 ```text
 index.html
 ```
 
-## Como executar
-
-### Recomendado (servidor local)
-
-Abrir o arquivo via `file://` funciona em muitos casos, mas o mapa geográfico (GeoJSON) e o áudio no iOS ficam mais confiáveis com HTTP:
+## Como jogar (local)
 
 ```bash
-# Python 3
+# na pasta do projeto
 python -m http.server 8000
-
-# ou Node
-npx serve
+# ou
+npx serve -l 8000
 ```
 
-Depois abra no navegador:
+Abra http://localhost:8000
 
-- Desktop: http://localhost:8000/
-- iPad (mesma rede Wi‑Fi): http://SEU-IP-LOCAL:8000/
+## Multiplayer online
 
-### Abertura direta
+```bash
+npm install
+npm start
+# servidor em ws://localhost:3080
+```
 
-Dê um duplo clique em `index.html` ou arraste-o para o Safari/Chrome.
+1. Em outro terminal, sirva o HTML (`python -m http.server 8000`).
+2. No setup do jogo: **Hospedar sala** (host).
+3. Outro PC/aba na mesma rede: informe o código e **Entrar na sala**.
+4. O host inicia a partida; o estado é sincronizado a cada turno.
 
-> **iPad:** use a extensão `.html` e, de preferência, o servidor local. O arquivo antigo `War-mobile` (sem extensão e com JS corrompido) **não deve ser usado**.
+> O host é a autoridade da simulação. Clientes recebem o estado e assistem / aguardam o assento.
 
-## Funcionalidades
+## Hotseat (mesmo aparelho)
 
-- 42 territórios · 6 continentes · combate com dados oficiais
-- **Defesa interativa**: quando você é atacado, o painel abre e **você rola os dados**
-- Painel de combate com **atacante, país de origem, país sob ataque e defensor**
-- IA com personalidades e níveis de competência
-- Objetivos secretos ou conquista total
-- Cartas de território e de **estratégia / guerra moderna**
-- Mapa mundi via GeoJSON (Natural Earth), com **fallback offline estável**
-- Zoom/pan com mouse, roda e **pinça no touch**
-- Layout com abas no tablet/mobile (Exércitos · Mapa · Comando)
+No setup, escolha **2 ou 3 humanos**. Quando for o turno do outro jogador, a dica pede para passar o aparelho.
 
-## Guerra moderna (cartas)
+## Sistemas novos
 
-Conquiste **2 ou mais** territórios no mesmo turno para receber uma carta de estratégia (máx. 3 na mão):
+| Sistema | O que faz |
+|---------|-----------|
+| **Centros ★** | 10 pontos no mapa com bônus de reforço; vitória “Domínio estratégico” = 6 centros |
+| **Capitais** | Cada jogador tem capital (defesa +1); capturar dá +2 exércitos |
+| **Unidades** | Visual: · infantaria, ⛨ tanque (×5), ▴ artilharia (×10), ⚓ costa, ✈ (12+) |
+| **Clima** | Primavera → Verão (monção) → Outono (tempestade no mar) → Inverno siberiano |
+| **Missões** | Mid-game: segurar Suez, conquistar Japão, etc. → reforços bônus |
+| **Diplomacia** | Aliança por 2 rodadas (sem atacar) + dar carta a outro humano |
+| **Guerra moderna** | Ataque aéreo, drones, domo de ferro, frota naval… |
 
-| Carta | Efeito |
-|-------|--------|
-| Ataque Aéreo | Bombardeia qualquer território inimigo (−1–2, sem conquistar) |
-| Frota Naval | +1 no maior dado de ataque em rota marítima |
-| Emboscada Naval | +1 dado de ataque (até 4) em rota marítima |
-| Enxame de Drones | −1 em inimigo adjacente + reconhecimento |
-| Domo de Ferro | Anula a 1ª perda na próxima defesa |
-| Ponte Aérea | Remaneja até 5 exércitos entre territórios seus (mesmo não adjacentes) |
-| Artilharia / Muralha / Blitz / Sabotagem / Espionagem / Trégua / Mobilização | Buffs e utilidades clássicos |
+## Opções no setup
 
-## Arquitetura
+- Objetivo secreto / conquista total / **domínio estratégico**  
+- 1–3 humanos  
+- Cartas de estratégia, defesa War (3 dados), rolar na defesa  
+- Clima, missões, capitais  
+- URL WebSocket e sala  
 
-| Arquivo | Status |
+## Arquivos
+
+| Arquivo | Função |
 |---------|--------|
-| `index.html` | **Principal** — UI + CSS + lógica unificados e responsivos |
-| `CODE_WAR` | Legado desktop (referência) |
-| `War-mobile` | Legado quebrado (não usar) |
-| `COM_PYTHON` / `DOCKER` | Notas de execução (Docker incompleto no repo) |
-
-## Regras (resumo)
-
-- Atacante: até **3 dados** (exércitos − 1)
-- Defensor: até **3 dados** com a opção *Regras War* (Grow); ou 2 no estilo Risk
-- **Empate favorece a defesa**
-- Conquistar ≥ 1 território no turno concede carta de território
-- Conquistar ≥ 2 no mesmo turno concede carta de estratégia
-
-## Opções na ordem de batalha
-
-- Cartas de estratégia e guerra moderna
-- Mínimo de 3 exércitos por rodada
-- Regras War (defesa até 3 dados)
-- Eu rolo os dados quando sou atacado
+| `index.html` | Jogo completo |
+| `server.mjs` | Multiplayer WebSocket |
+| `package.json` | Dependência `ws` |
+| `CODE_WAR` / `War-mobile` | Legado (não usar) |
 
 ## Licença
 
-MIT (conforme badges do projeto original).
+MIT.

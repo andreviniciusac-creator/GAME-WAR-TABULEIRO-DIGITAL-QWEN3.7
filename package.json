@@ -1,0 +1,14 @@
+{
+  "name": "war-tabuleiro-digital",
+  "version": "2.0.0",
+  "description": "WAR — tabuleiro digital com multiplayer WebSocket",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "serve": "npx --yes serve -l 8000",
+    "game": "npx --yes serve -l 8000"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
